@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTrack — Rendiconto Finanziario</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg: #f5f7fa; --surface: #fff; --surface2: #f0f4f8;
+    --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
+    --text: #1a2940; --muted: #5a6a7e; --hint: #94a3b8;
+    --blue: #2D6A9F; --blue-l: #e8f2fb;
+    --green: #27AE60; --green-l: #e8f8ef;
+    --red: #E05A4A; --red-l: #fdf0ee;
+    --amber: #F39C12; --amber-l: #fdf5e8;
+    --purple: #8E44AD; --purple-l: #f5eeff;
+    --navy: #1A2940; --r: 12px; --r-sm: 8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* ── AUTH ── */
+  #auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+  .auth-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:2.5rem;width:400px;max-width:100%}
+  .auth-logo{text-align:center;margin-bottom:2rem}
+  .auth-logo h1{font-size:22px;font-weight:700;color:var(--navy)}
+  .auth-logo p{font-size:13px;color:var(--muted);margin-top:4px}
+  .auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+  .auth-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+  .auth-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+  .auth-form{display:none}.auth-form.active{display:block}
+  .field{margin-bottom:1rem}
+  .field label{display:block;font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+  .field input{width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:14px;color:var(--text);background:var(--surface);outline:none;transition:border .15s}
+  .field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,106,159,.1)}
+  .btn-auth{width:100%;padding:11px;border-radius:var(--r-sm);background:var(--navy);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;margin-top:.5rem;transition:background .15s}
+  .btn-auth:hover{background:var(--blue)}
+  .auth-error{background:var(--red-l);color:var(--red);padding:10px 12px;border-radius:var(--r-sm);font-size:13px;margin-bottom:1rem;display:none}
+  .auth-error.show{display:block}
+
+  /* ── APP ── */
+  #app-screen{display:none}
+  .topbar{background:var(--navy);color:#fff;padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .topbar h1{font-size:15px;font-weight:700;letter-spacing:.02em}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .user-badge{font-size:12px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px}
+  .btn-logout{font-size:12px;background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;cursor:pointer}
+  .btn-logout:hover{background:rgba(255,255,255,.1)}
+  .tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 1.5rem;overflow-x:auto}
+  .tab{padding:13px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+  .tab:hover{color:var(--text)}.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+  .page{display:none;padding:1.5rem;max-width:1280px;margin:0 auto}.page.active{display:block}
+
+  /* ── CARDS & LAYOUT ── */
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:1.5rem}
+  .kpi{background:var(--surface);border-radius:var(--r);padding:1.25rem 1.5rem;border:1px solid var(--border)}
+  .kpi .lbl{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .kpi .val{font-size:24px;font-weight:700;line-height:1}
+  .kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}
+  .kpi.green .val{color:var(--green)}.kpi.red .val{color:var(--red)}
+  .kpi.blue .val{color:var(--blue)}.kpi.amber .val{color:var(--amber)}.kpi.purple .val{color:var(--purple)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem}
+  @media(max-width:768px){.row2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden}
+  .card-hdr{padding:.9rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .card-hdr h3{font-size:13px;font-weight:700}
+  .card-body{padding:1.25rem}
+
+  /* ── TABLES ── */
+  .tw{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--hint);padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+  td{padding:9px 10px;border-bottom:1px solid rgba(0,0,0,.04);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:var(--surface2)}
+  .tr-tot td{font-weight:700;background:var(--surface2);border-top:1.5px solid var(--border)}
+
+  /* ── BADGES ── */
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+  .pill-green{background:var(--green-l);color:var(--green)}.pill-red{background:var(--red-l);color:var(--red)}
+  .pill-amber{background:var(--amber-l);color:var(--amber)}.pill-blue{background:var(--blue-l);color:var(--blue)}
+  .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;background:var(--surface2);color:var(--muted)}
+  .pos{color:var(--green);font-weight:700}.neg{color:var(--red);font-weight:700}
+
+  /* ── BUTTONS ── */
+  .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;color:var(--text);transition:background .12s}
+  .btn:hover{background:var(--surface2)}
+  .btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-primary:hover{background:var(--navy);border-color:var(--navy)}
+  .btn-sm{padding:4px 8px;font-size:11px}
+  .action-bar{display:flex;gap:10px;margin-bottom:1.25rem;align-items:center;flex-wrap:wrap}
+  .sec-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+  /* ── MODAL ── */
+  .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+  .modal-ov.open{display:flex}
+  .modal{background:var(--surface);border-radius:var(--r);padding:2rem;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto}
+  .modal h2{font-size:16px;font-weight:700;margin-bottom:1.5rem}
+  .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:1.5rem}
+  .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:.75rem}
+  .fg label{display:block;font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .fg input,.fg select{width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;background:var(--surface);color:var(--text);outline:none}
+  .fg input:focus,.fg select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,106,159,.1)}
+
+  /* ── PROGRESS ── */
+  .prog-bar{background:var(--surface2);border-radius:20px;height:7px;overflow:hidden;margin-top:5px}
+  .prog-fill{height:100%;border-radius:20px;transition:width .4s}
+
+  /* ── CHART ── */
+  .chart-wrap{position:relative;width:100%;height:240px}
+
+  /* ── RENDICONTO ── */
+  .ren-table{width:100%;font-size:12px;border-collapse:collapse}
+  .ren-table th{background:var(--navy);color:#fff;padding:7px 8px;font-size:10px;text-align:center;white-space:nowrap}
+  .ren-table th:first-child{text-align:left;min-width:160px}
+  .ren-table td{padding:7px 8px;text-align:right;border-bottom:1px solid rgba(0,0,0,.04);font-variant-numeric:tabular-nums}
+  .ren-table td:first-child{text-align:left;font-weight:500}
+  .ren-table .sec-row td{background:var(--blue-l);font-weight:700;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  .ren-table .tot-row td{background:var(--amber-l);font-weight:700;font-size:13px}
+
+  /* ── LOADING ── */
+  .loading{text-align:center;padding:2rem;color:var(--hint);font-size:13px}
+  .empty{text-align:center;padding:2.5rem;color:var(--hint);font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- ═══ AUTH ═══ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <h1>&#x1F4CA; FinTrack</h1>
+      <p>Rendiconto Economico-Finanziario Personale</p>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-tab="login">Accedi</div>
+      <div class="auth-tab" data-tab="register">Registrati</div>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+
+    <div id="form-login" class="auth-form active">
+      <div class="field"><label>Username</label><input id="l-user" type="text" placeholder="Il tuo username" autocomplete="username"></div>
+      <div class="field"><label>Password</label><input id="l-pass" type="password" placeholder="Password" autocomplete="current-password"></div>
+      <button class="btn-auth" onclick="doLogin()">Entra</button>
+    </div>
+
+    <div id="form-register" class="auth-form">
+      <div class="field"><label>Nome</label><input id="r-nome" type="text" placeholder="Come ti chiami?"></div>
+      <div class="field"><label>Username</label><input id="r-user" type="text" placeholder="Scegli un username" autocomplete="username"></div>
+      <div class="field"><label>Password</label><input id="r-pass" type="password" placeholder="Minimo 8 caratteri" autocomplete="new-password"></div>
+      <button class="btn-auth" onclick="doRegister()">Crea account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app-screen">
+  <div class="topbar">
+    <h1>&#x1F4CA; FinTrack</h1>
+    <div class="topbar-right">
+      <span class="user-badge" id="user-label"></span>
+      <button class="btn-logout" onclick="logout()">Esci</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-tab="dashboard">Panoramica</div>
+    <div class="tab" data-tab="abbonamenti">Abbonamenti</div>
+    <div class="tab" data-tab="spese">Spese</div>
+    <div class="tab" data-tab="entrate">Entrate</div>
+    <div class="tab" data-tab="carte">Carte</div>
+    <div class="tab" data-tab="rendiconto">Rendiconto</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="kpi-grid" id="kpi-grid"><div class="loading">Caricamento...</div></div>
+    <div class="row2">
+      <div class="card"><div class="card-hdr"><h3>Flusso Entrate / Uscite</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-flussi" role="img" aria-label="Entrate vs uscite mensili">Grafico entrate vs uscite.</canvas></div></div></div>
+      <div class="card"><div class="card-hdr"><h3>Spese per Categoria</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-cat" role="img" aria-label="Spese per categoria">Grafico categorie.</canvas></div></div></div>
+    </div>
+    <div class="row2">
+      <div class="card"><div class="card-hdr"><h3>Abbonamenti Attivi</h3><span class="pill pill-blue" id="dash-abb-cnt">0</span></div><div class="card-body tw"><table><thead><tr><th>Servizio</th><th>Carta</th><th>Freq.</th><th>€/mese</th></tr></thead><tbody id="dash-abb-tbody"></tbody></table></div></div>
+      <div class="card"><div class="card-hdr"><h3>Utilizzo Carte</h3></div><div class="card-body" id="dash-carte-body"></div></div>
+    </div>
+  </div>
+
+  <!-- ABBONAMENTI -->
+  <div class="page" id="page-abbonamenti">
+    <div class="action-bar"><span class="sec-title">Abbonamenti Ricorrenti</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-abb')">+ Aggiungi</button></div>
+    <div class="card tw"><table><thead><tr><th>Servizio</th><th>Cat.</th><th>Importo</th><th>Freq.</th><th>Rinnovo</th><th>Carta</th><th>Stato</th><th>€/mese</th><th></th></tr></thead><tbody id="abb-tbody"></tbody><tfoot><tr class="tr-tot" id="abb-tfoot"></tr></tfoot></table></div>
+  </div>
+
+  <!-- SPESE -->
+  <div class="page" id="page-spese">
+    <div class="action-bar"><span class="sec-title">Registro Spese</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-spesa')">+ Aggiungi</button></div>
+    <div class="card tw"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Fornitore</th><th>Importo</th><th>Carta</th><th>Deducibile</th><th></th></tr></thead><tbody id="spese-tbody"></tbody><tfoot><tr class="tr-tot" id="spese-tfoot"></tr></tfoot></table></div>
+  </div>
+
+  <!-- ENTRATE -->
+  <div class="page" id="page-entrate">
+    <div class="action-bar"><span class="sec-title">Registro Entrate</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-entrata')">+ Aggiungi</button></div>
+    <div class="card tw"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Provenienza</th><th>Importo</th><th>Conto</th><th>Periodicità</th><th></th></tr></thead><tbody id="entrate-tbody"></tbody><tfoot><tr class="tr-tot" id="entrate-tfoot"></tr></tfoot></table></div>
+  </div>
+
+  <!-- CARTE -->
+  <div class="page" id="page-carte">
+    <div class="action-bar"><span class="sec-title">Carte &amp; Metodi di Pagamento</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-carta')">+ Aggiungi</button></div>
+    <div class="card tw"><table><thead><tr><th>Nome</th><th>Banca</th><th>Ultime 4</th><th>Tipo</th><th>Limite</th><th>Saldo usato</th><th>Utilizzo</th><th>Scadenza</th><th></th></tr></thead><tbody id="carte-tbody"></tbody><tfoot><tr class="tr-tot" id="carte-tfoot"></tr></tfoot></table></div>
+  </div>
+
+  <!-- RENDICONTO -->
+  <div class="page" id="page-rendiconto">
+    <div class="action-bar"><span class="sec-title">Rendiconto Economico-Finanziario</span><div style="flex:1"></div><span class="tag">&#x26A1; Aggiornamento automatico</span></div>
+    <div class="card"><div class="card-body tw"><table class="ren-table"><thead><tr><th>Voce</th><th>Gen</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mag</th><th>Giu</th><th>Lug</th><th>Ago</th><th>Set</th><th>Ott</th><th>Nov</th><th>Dic</th><th>Totale</th></tr></thead><tbody id="ren-tbody"></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+<div class="modal-ov" id="m-abb">
+  <div class="modal"><h2>Nuovo Abbonamento</h2>
+    <div class="form-row"><div class="fg"><label>Servizio</label><input id="ab-n" placeholder="es. Netflix"></div><div class="fg"><label>Categoria</label><select id="ab-c"><option>Streaming</option><option>Musica</option><option>Produttività</option><option>Cloud</option><option>Design</option><option>Fitness</option><option>News</option><option>Altro</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Importo (€)</label><input id="ab-i" type="number" step="0.01" placeholder="0.00"></div><div class="fg"><label>Frequenza</label><select id="ab-f"><option>Mensile</option><option>Annuale</option><option>Trimestrale</option><option>Semestrale</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Prossimo rinnovo</label><input id="ab-r" type="date"></div><div class="fg"><label>Carta</label><input id="ab-cc" placeholder="Visa xxxx-1234"></div></div>
+    <div class="form-row"><div class="fg"><label>Stato</label><select id="ab-s"><option>Attivo</option><option>Sospeso</option><option>Cancellato</option></select></div><div class="fg"><label>Note</label><input id="ab-no" placeholder="Facoltativo"></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-abb')">Annulla</button><button class="btn btn-primary" onclick="saveAbb()">Salva</button></div>
+  </div>
+</div>
+
+<div class="modal-ov" id="m-spesa">
+  <div class="modal"><h2>Nuova Spesa</h2>
+    <div class="form-row"><div class="fg"><label>Data</label><input id="sp-d" type="date"></div><div class="fg"><label>Importo (€)</label><input id="sp-i" type="number" step="0.01" placeholder="0.00"></div></div>
+    <div class="form-row"><div class="fg"><label>Descrizione</label><input id="sp-de" placeholder="Descrizione"></div><div class="fg"><label>Categoria</label><select id="sp-c"><option>Alimentari</option><option>Trasporti</option><option>Salute</option><option>Abbigliamento</option><option>Casa</option><option>Ristoranti</option><option>Tecnologia</option><option>Formazione</option><option>Intrattenimento</option><option>Viaggi</option><option>Utenze</option><option>Abbonamenti</option><option>Altro</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Fornitore</label><input id="sp-fo" placeholder="Nome"></div><div class="fg"><label>Carta</label><input id="sp-cc" placeholder="Visa xxxx-1234"></div></div>
+    <div class="form-row"><div class="fg"><label>Deducibile</label><select id="sp-de2"><option>No</option><option>Sì</option></select></div><div class="fg"><label>Note</label><input id="sp-no" placeholder="Facoltativo"></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-spesa')">Annulla</button><button class="btn btn-primary" onclick="saveSpesa()">Salva</button></div>
+  </div>
+</div>
+
+<div class="modal-ov" id="m-entrata">
+  <div class="modal"><h2>Nuova Entrata</h2>
+    <div class="form-row"><div class="fg"><label>Data</label><input id="en-d" type="date"></div><div class="fg"><label>Importo (€)</label><input id="en-i" type="number" step="0.01" placeholder="0.00"></div></div>
+    <div class="form-row"><div class="fg"><label>Descrizione</label><input id="en-de" placeholder="Descrizione"></div><div class="fg"><label>Categoria</label><select id="en-c"><option>Stipendio</option><option>Freelance</option><option>Dividendi</option><option>Affitti</option><option>Rimborsi</option><option>Altro</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Provenienza</label><input id="en-pr" placeholder="Da chi"></div><div class="fg"><label>Conto accredito</label><input id="en-co" placeholder="es. Conto BNL"></div></div>
+    <div class="form-row"><div class="fg"><label>Periodicità</label><select id="en-pe"><option>Una tantum</option><option>Mensile</option><option>Trimestrale</option><option>Annuale</option></select></div><div class="fg"><label>Note</label><input id="en-no" placeholder="Facoltativo"></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-entrata')">Annulla</button><button class="btn btn-primary" onclick="saveEntrata()">Salva</button></div>
+  </div>
+</div>
+
+<div class="modal-ov" id="m-carta">
+  <div class="modal"><h2>Nuova Carta / Metodo di Pagamento</h2>
+    <div class="form-row"><div class="fg"><label>Nome carta</label><input id="cc-n" placeholder="Visa Classica"></div><div class="fg"><label>Banca</label><input id="cc-b" placeholder="Banca Sella"></div></div>
+    <div class="form-row"><div class="fg"><label>Ultime 4 cifre</label><input id="cc-nu" maxlength="4" placeholder="1234"></div><div class="fg"><label>Tipo</label><select id="cc-t"><option>Credito</option><option>Debito</option><option>Prepagata</option><option>Digitale</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Limite (€)</label><input id="cc-l" type="number" step="100" placeholder="0"></div><div class="fg"><label>Saldo usato (€)</label><input id="cc-s" type="number" step="0.01" placeholder="0.00"></div></div>
+    <div class="form-row"><div class="fg"><label>Scadenza</label><input id="cc-sc" placeholder="MM/AAAA"></div><div class="fg"><label>Note</label><input id="cc-no" placeholder="Facoltativo"></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-carta')">Annulla</button><button class="btn btn-primary" onclick="saveCarta()">Salva</button></div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let token = localStorage.getItem('ft_token') || '';
+let state = { abbonamenti:[], spese:[], entrate:[], carte:[] };
+let chartF = null, chartC = null;
+
+// ── helpers ────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const fmt = n => (n||0).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const fmtPct = n => (n*100).toFixed(1)+'%';
+function mensile(a) {
+  if(a.freq==='Mensile') return +a.imp;
+  if(a.freq==='Annuale') return +a.imp/12;
+  if(a.freq==='Trimestrale') return +a.imp/3;
+  if(a.freq==='Semestrale') return +a.imp/6;
+  return 0;
+}
+function mIdx(d){ if(!d) return -1; return new Date(d).getMonth(); }
+
+async function api(method, path, body) {
+  const r = await fetch(API+path, {
+    method, headers: {'Content-Type':'application/json', ...(token?{'Authorization':'Bearer '+token}:{})},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await r.json();
+  if(!r.ok) throw new Error(data.error || 'Errore');
+  return data;
+}
+
+// ── AUTH ───────────────────────────────────────────────────────
+document.querySelectorAll('.auth-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.auth-tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.auth-form').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    $('form-'+t.dataset.tab).classList.add('active');
+    $('auth-error').classList.remove('show');
+  });
+});
+
+function showErr(msg){ const e=$('auth-error'); e.textContent=msg; e.classList.add('show'); }
+
+async function doLogin() {
+  try {
+    const d = await api('POST','/api/login',{username:$('l-user').value.trim(),password:$('l-pass').value});
+    token = d.token; localStorage.setItem('ft_token',token);
+    $('user-label').textContent = d.nome || d.username;
+    showApp();
+  } catch(e){ showErr(e.message); }
+}
+
+async function doRegister() {
+  if($('r-pass').value.length < 8){ showErr('Password di almeno 8 caratteri'); return; }
+  try {
+    const d = await api('POST','/api/register',{username:$('r-user').value.trim(),password:$('r-pass').value,nome:$('r-nome').value.trim()});
+    token = d.token; localStorage.setItem('ft_token',token);
+    $('user-label').textContent = d.nome || d.username;
+    showApp();
+  } catch(e){ showErr(e.message); }
+}
+
+function logout(){ token=''; localStorage.removeItem('ft_token'); location.reload(); }
+
+// ── APP ────────────────────────────────────────────────────────
+async function showApp() {
+  $('auth-screen').style.display='none';
+  $('app-screen').style.display='block';
+  await loadAll();
+  renderAll();
+}
+
+async function loadAll() {
+  const [a,s,e,c] = await Promise.all([
+    api('GET','/api/abbonamenti'),
+    api('GET','/api/spese'),
+    api('GET','/api/entrate'),
+    api('GET','/api/carte')
+  ]);
+  state = {abbonamenti:a, spese:s, entrate:e, carte:c};
+}
+
+function renderAll() {
+  renderDashboard();
+  renderAbb();
+  renderSpese();
+  renderEntrate();
+  renderCarte();
+  renderRendiconto();
+}
+
+function renderDashboard() {
+  const attivi = state.abbonamenti.filter(a=>a.stato==='Attivo');
+  const costoM = attivi.reduce((s,a)=>s+mensile(a),0);
+  const totE = state.entrate.reduce((s,e)=>s+(+e.imp||0),0);
+  const totS = state.spese.reduce((s,e)=>s+(+e.imp||0),0);
+  const uscite = totS + costoM;
+  const saldo = totE - uscite;
+  const totLim = state.carte.reduce((s,c)=>s+(+c.lim||0),0);
+  const totSCC = state.carte.reduce((s,c)=>s+(+c.saldo||0),0);
+
+  $('kpi-grid').innerHTML = [
+    {l:'Entrate Totali', v:fmt(totE), cls:'green', s:''},
+    {l:'Uscite Totali', v:fmt(uscite), cls:'red', s:''},
+    {l:'Saldo Netto', v:fmt(saldo), cls:saldo>=0?'green':'red', s:''},
+    {l:'Abbonamenti/mese', v:fmt(costoM), cls:'blue', s:fmt(costoM*12)+'/anno'},
+    {l:'Abb. Attivi', v:attivi.length, cls:'purple', s:''},
+    {l:'Utilizzo Carte', v:totLim>0?fmtPct(totSCC/totLim):'—', cls:'amber', s:fmt(totSCC)+' / '+fmt(totLim)},
+  ].map(k=>`<div class="kpi ${k.cls}"><div class="lbl">${k.l}</div><div class="val">${k.v}</div>${k.s?`<div class="sub">${k.s}</div>`:''}</div>`).join('');
+
+  $('dash-abb-cnt').textContent = attivi.length+' attivi';
+  $('dash-abb-tbody').innerHTML = attivi.slice(0,6).map(a=>
+    `<tr><td><b>${a.nome}</b></td><td><span class="tag">${a.carta||'—'}</span></td><td>${a.freq}</td><td><b>${fmt(mensile(a))}</b></td></tr>`
+  ).join('') || '<tr><td colspan="4" class="empty">Nessun abbonamento</td></tr>';
+
+  $('dash-carte-body').innerHTML = state.carte.map(c=>{
+    const p = +c.lim>0 ? (+c.saldo)/(+c.lim) : 0;
+    const col = p>.8?'var(--red)':p>.5?'var(--amber)':'var(--green)';
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px">
+        <span><b>${c.nome}</b> <span class="tag">${c.num||'—'}</span></span>
+        <span style="color:${col};font-weight:700">${fmtPct(p)}</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(p*100,100).toFixed(1)}%;background:${col}"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--hint);margin-top:3px"><span>${fmt(+c.saldo)} usati</span><span>Limite ${fmt(+c.lim)}</span></div>
+    </div>`;
+  }).join('') || '<div class="empty">Nessuna carta registrata</div>';
+
+  buildCharts(attivi, costoM);
+}
+
+function buildCharts(attivi, costoM) {
+  const months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const eM=new Array(12).fill(0), sM=new Array(12).fill(0);
+  state.entrate.forEach(e=>{const m=mIdx(e.data);if(m>=0)eM[m]+=(+e.imp||0)});
+  state.spese.forEach(s=>{const m=mIdx(s.data);if(m>=0)sM[m]+=(+s.imp||0)});
+  const uM = sM.map(v=>v+costoM);
+  if(chartF) chartF.destroy();
+  chartF = new Chart($('chart-flussi'),{type:'bar',data:{labels:months,datasets:[
+    {label:'Entrate',data:eM,backgroundColor:'rgba(39,174,96,.7)',borderRadius:4},
+    {label:'Uscite',data:uM,backgroundColor:'rgba(224,90,74,.7)',borderRadius:4}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>v+'€'}}}}});
+
+  const catMap={};
+  state.spese.forEach(s=>{catMap[s.cat]=(catMap[s.cat]||0)+(+s.imp||0)});
+  attivi.forEach(a=>{catMap['Abbonamenti']=(catMap['Abbonamenti']||0)+mensile(a)});
+  const labs=Object.keys(catMap), vals=Object.values(catMap);
+  const pal=['#2D6A9F','#27AE60','#E05A4A','#F39C12','#8E44AD','#16A085','#D35400','#2C3E50','#1ABC9C','#E74C3C'];
+  if(chartC) chartC.destroy();
+  if(!labs.length){$('chart-cat').parentElement.innerHTML='<div class="empty">Nessuna spesa inserita</div>';return;}
+  chartC = new Chart($('chart-cat'),{type:'doughnut',data:{labels:labs,datasets:[{data:vals,backgroundColor:pal.slice(0,labs.length),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}}}}});
+}
+
+function renderAbb() {
+  const tb = $('abb-tbody');
+  if(!state.abbonamenti.length){tb.innerHTML='<tr><td colspan="9"><div class="empty">Nessun abbonamento</div></td></tr>';$('abb-tfoot').innerHTML='';return;}
+  tb.innerHTML = state.abbonamenti.map(a=>{
+    const bc=a.stato==='Attivo'?'pill-green':a.stato==='Sospeso'?'pill-amber':'pill-red';
+    return `<tr><td><b>${a.nome}</b></td><td><span class="tag">${a.cat||'—'}</span></td><td>${fmt(+a.imp)}</td><td>${a.freq}</td><td>${a.rinnovo||'—'}</td><td style="font-size:11px">${a.carta||'—'}</td><td><span class="pill ${bc}">${a.stato}</span></td><td><b>${fmt(mensile(a))}</b></td><td><button class="btn btn-sm" onclick="del('abbonamenti','${a.id}')">&#x1F5D1;</button></td></tr>`;
+  }).join('');
+  const tot=state.abbonamenti.filter(a=>a.stato==='Attivo').reduce((s,a)=>s+mensile(a),0);
+  $('abb-tfoot').innerHTML=`<td colspan="7"><b>Totale mensile attivi</b></td><td><b>${fmt(tot)}</b></td><td></td>`;
+}
+
+function renderSpese() {
+  const tb=$('spese-tbody');
+  if(!state.spese.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Nessuna spesa</div></td></tr>';$('spese-tfoot').innerHTML='';return;}
+  tb.innerHTML=state.spese.map(s=>`<tr><td>${s.data||'—'}</td><td>${s.desc||s.de||'—'}</td><td><span class="tag">${s.cat}</span></td><td>${s.forn||s.fo||'—'}</td><td><b>${fmt(+s.imp)}</b></td><td style="font-size:11px">${s.carta||s.cc||'—'}</td><td><span class="pill ${s.deduct==='Sì'?'pill-green':'pill-red'}">${s.deduct||'No'}</span></td><td><button class="btn btn-sm" onclick="del('spese','${s.id}')">&#x1F5D1;</button></td></tr>`).join('');
+  const tot=state.spese.reduce((s,e)=>s+(+e.imp||0),0);
+  $('spese-tfoot').innerHTML=`<td colspan="4"><b>Totale spese</b></td><td><b>${fmt(tot)}</b></td><td colspan="3"></td>`;
+}
+
+function renderEntrate() {
+  const tb=$('entrate-tbody');
+  if(!state.entrate.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Nessuna entrata</div></td></tr>';$('entrate-tfoot').innerHTML='';return;}
+  tb.innerHTML=state.entrate.map(e=>`<tr><td>${e.data||'—'}</td><td>${e.desc||e.de||'—'}</td><td><span class="tag">${e.cat}</span></td><td>${e.prov||e.pr||'—'}</td><td><b class="pos">${fmt(+e.imp)}</b></td><td style="font-size:11px">${e.conto||e.co||'—'}</td><td>${e.per||'—'}</td><td><button class="btn btn-sm" onclick="del('entrate','${e.id}')">&#x1F5D1;</button></td></tr>`).join('');
+  const tot=state.entrate.reduce((s,e)=>s+(+e.imp||0),0);
+  $('entrate-tfoot').innerHTML=`<td colspan="4"><b>Totale entrate</b></td><td><b class="pos">${fmt(tot)}</b></td><td colspan="3"></td>`;
+}
+
+function renderCarte() {
+  const tb=$('carte-tbody');
+  if(!state.carte.length){tb.innerHTML='<tr><td colspan="9"><div class="empty">Nessuna carta</div></td></tr>';$('carte-tfoot').innerHTML='';return;}
+  tb.innerHTML=state.carte.map(c=>{
+    const p=+c.lim>0?(+c.saldo)/(+c.lim):0;
+    const col=p>.8?'var(--red)':p>.5?'var(--amber)':'var(--green)';
+    return `<tr><td><b>${c.nome}</b></td><td>${c.banca||'—'}</td><td>xxxx-${c.num||'—'}</td><td><span class="tag">${c.tipo}</span></td><td>${fmt(+c.lim)}</td><td>${fmt(+c.saldo)}</td><td style="color:${col};font-weight:700">${fmtPct(p)}</td><td>${c.scad||'—'}</td><td><button class="btn btn-sm" onclick="del('carte','${c.id}')">&#x1F5D1;</button></td></tr>`;
+  }).join('');
+  const tL=state.carte.reduce((s,c)=>s+(+c.lim||0),0), tS=state.carte.reduce((s,c)=>s+(+c.saldo||0),0);
+  $('carte-tfoot').innerHTML=`<td colspan="4"><b>Totale</b></td><td><b>${fmt(tL)}</b></td><td><b>${fmt(tS)}</b></td><td colspan="3"></td>`;
+}
+
+function renderRendiconto() {
+  const months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const attivi=state.abbonamenti.filter(a=>a.stato==='Attivo');
+  const cm=attivi.reduce((s,a)=>s+mensile(a),0);
+  const eM=new Array(12).fill(0), sM=new Array(12).fill(0);
+  state.entrate.forEach(e=>{const m=mIdx(e.data);if(m>=0)eM[m]+=(+e.imp||0)});
+  state.spese.forEach(s=>{const m=mIdx(s.data);if(m>=0)sM[m]+=(+s.imp||0)});
+  const abbM=new Array(12).fill(cm);
+  const uTot=months.map((_,i)=>sM[i]+cm);
+  const sal=months.map((_,i)=>eM[i]-uTot[i]);
+
+  function row(label, vals, cls='') {
+    const tot=vals.reduce((a,b)=>a+b,0);
+    const isSaldo=cls.includes('sal');
+    return `<tr class="${cls}"><td>${label}</td>${vals.map(v=>`<td class="${isSaldo?(v>=0?'pos':'neg'):''}">${fmt(v)}</td>`).join('')}<td class="${isSaldo?(tot>=0?'pos':'neg')}">${fmt(tot)}</td></tr>`;
+  }
+
+  $('ren-tbody').innerHTML =
+    `<tr class="sec-row"><td colspan="14">&#x1F4B0; ENTRATE</td></tr>` + row('Entrate inserite', eM) +
+    `<tr class="sec-row"><td colspan="14">&#x1F4B8; USCITE</td></tr>` +
+    row('Spese varie', sM) + row('Abbonamenti mensili', abbM) + row('Totale uscite', uTot, 'tot-row') +
+    `<tr class="sec-row"><td colspan="14">&#x2696;&#xFE0F; SALDO</td></tr>` + row('Saldo netto', sal, 'tot-row sal') +
+    `<tr class="sec-row"><td colspan="14">&#x1F504; ABBONAMENTI</td></tr>` +
+    `<tr><td>N° attivi</td>${months.map(()=>`<td>${attivi.length}</td>`).join('')}<td>${attivi.length}</td></tr>` +
+    row('Costo mensile abb.', abbM) +
+    `<tr><td>Costo annuo abb.</td>${months.map(()=>'<td>—</td>').join('')}<td><b>${fmt(cm*12)}</b></td></tr>`;
+}
+
+// ── CRUD ───────────────────────────────────────────────────────
+async function saveAbb() {
+  const body={nome:$('ab-n').value.trim(),cat:$('ab-c').value,imp:+$('ab-i').value||0,freq:$('ab-f').value,rinnovo:$('ab-r').value,carta:$('ab-cc').value.trim(),stato:$('ab-s').value,note:$('ab-no').value.trim()};
+  if(!body.nome){alert('Inserisci il nome del servizio');return;}
+  await api('POST','/api/abbonamenti',body);
+  closeModal('m-abb'); await loadAll(); renderAll();
+}
+async function saveSpesa() {
+  const body={data:$('sp-d').value,imp:+$('sp-i').value||0,desc:$('sp-de').value.trim(),cat:$('sp-c').value,forn:$('sp-fo').value.trim(),carta:$('sp-cc').value.trim(),deduct:$('sp-de2').value,note:$('sp-no').value.trim()};
+  if(!body.desc){alert('Inserisci una descrizione');return;}
+  await api('POST','/api/spese',body);
+  closeModal('m-spesa'); await loadAll(); renderAll();
+}
+async function saveEntrata() {
+  const body={data:$('en-d').value,imp:+$('en-i').value||0,desc:$('en-de').value.trim(),cat:$('en-c').value,prov:$('en-pr').value.trim(),conto:$('en-co').value.trim(),per:$('en-pe').value,note:$('en-no').value.trim()};
+  if(!body.desc){alert('Inserisci una descrizione');return;}
+  await api('POST','/api/entrate',body);
+  closeModal('m-entrata'); await loadAll(); renderAll();
+}
+async function saveCarta() {
+  const body={nome:$('cc-n').value.trim(),banca:$('cc-b').value.trim(),num:$('cc-nu').value.trim(),tipo:$('cc-t').value,lim:+$('cc-l').value||0,saldo:+$('cc-s').value||0,scad:$('cc-sc').value.trim(),note:$('cc-no').value.trim()};
+  if(!body.nome){alert('Inserisci il nome della carta');return;}
+  await api('POST','/api/carte',body);
+  closeModal('m-carta'); await loadAll(); renderAll();
+}
+
+async function del(resource, id) {
+  if(!confirm('Eliminare questo elemento?')) return;
+  await api('DELETE',`/api/${resource}/${id}`);
+  await loadAll(); renderAll();
+}
+
+// ── TABS ───────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    $('page-'+t.dataset.tab).classList.add('active');
+  });
+});
+
+function openModal(id){
+  const today=new Date().toISOString().split('T')[0];
+  if(id==='m-spesa') $('sp-d').value=today;
+  if(id==='m-entrata') $('en-d').value=today;
+  $(id).classList.add('open');
+}
+function closeModal(id){ $(id).classList.remove('open'); }
+document.querySelectorAll('.modal-ov').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+
+// ── BOOT ───────────────────────────────────────────────────────
+(async () => {
+  if(token) {
+    try {
+      const me = await api('GET','/api/me');
+      $('user-label').textContent = me.nome || me.username;
+      await showApp();
+    } catch { token=''; localStorage.removeItem('ft_token'); }
+  }
+})();
+</script>
+</body>
+</html>
