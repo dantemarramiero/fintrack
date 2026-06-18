@@ -143,6 +143,11 @@ app.post('/api/login', async (req, res) => {
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
+app.delete('/api/reset-users', (req, res) => {
+  db.prepare('DELETE FROM users').run();
+  res.json({ ok: true });
+});
+
 app.get('/api/me', auth, (req, res) => {
   const user = db.prepare('SELECT id,username,nome,email,reminder_days FROM users WHERE id=?').get(req.user.id);
   res.json(user);
