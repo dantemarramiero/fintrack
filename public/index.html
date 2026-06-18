@@ -20,7 +20,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
-  /* ── AUTH ── */
+  /* AUTH */
   #auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
   .auth-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:2.5rem;width:400px;max-width:100%}
   .auth-logo{text-align:center;margin-bottom:2rem}
@@ -39,7 +39,7 @@
   .auth-error{background:var(--red-l);color:var(--red);padding:10px 12px;border-radius:var(--r-sm);font-size:13px;margin-bottom:1rem;display:none}
   .auth-error.show{display:block}
 
-  /* ── APP ── */
+  /* APP */
   #app-screen{display:none}
   .topbar{background:var(--navy);color:#fff;padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
   .topbar h1{font-size:15px;font-weight:700;letter-spacing:.02em}
@@ -47,12 +47,14 @@
   .user-badge{font-size:12px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px}
   .btn-logout{font-size:12px;background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;cursor:pointer}
   .btn-logout:hover{background:rgba(255,255,255,.1)}
+  .btn-settings{font-size:14px;background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 10px;cursor:pointer;line-height:1}
+  .btn-settings:hover{background:rgba(255,255,255,.1)}
   .tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 1.5rem;overflow-x:auto}
   .tab{padding:13px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
   .tab:hover{color:var(--text)}.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
   .page{display:none;padding:1.5rem;max-width:1280px;margin:0 auto}.page.active{display:block}
 
-  /* ── CARDS & LAYOUT ── */
+  /* CARDS & LAYOUT */
   .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:1.5rem}
   .kpi{background:var(--surface);border-radius:var(--r);padding:1.25rem 1.5rem;border:1px solid var(--border)}
   .kpi .lbl{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
@@ -67,7 +69,7 @@
   .card-hdr h3{font-size:13px;font-weight:700}
   .card-body{padding:1.25rem}
 
-  /* ── TABLES ── */
+  /* TABLES */
   .tw{overflow-x:auto}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th{text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--hint);padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
@@ -76,14 +78,14 @@
   tr:hover td{background:var(--surface2)}
   .tr-tot td{font-weight:700;background:var(--surface2);border-top:1.5px solid var(--border)}
 
-  /* ── BADGES ── */
+  /* BADGES */
   .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
   .pill-green{background:var(--green-l);color:var(--green)}.pill-red{background:var(--red-l);color:var(--red)}
   .pill-amber{background:var(--amber-l);color:var(--amber)}.pill-blue{background:var(--blue-l);color:var(--blue)}
   .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;background:var(--surface2);color:var(--muted)}
   .pos{color:var(--green);font-weight:700}.neg{color:var(--red);font-weight:700}
 
-  /* ── BUTTONS ── */
+  /* BUTTONS */
   .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;color:var(--text);transition:background .12s}
   .btn:hover{background:var(--surface2)}
   .btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-primary:hover{background:var(--navy);border-color:var(--navy)}
@@ -91,7 +93,12 @@
   .action-bar{display:flex;gap:10px;margin-bottom:1.25rem;align-items:center;flex-wrap:wrap}
   .sec-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 
-  /* ── MODAL ── */
+  /* FILTER PILLS */
+  .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+  .fpill{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all .12s}
+  .fpill.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+  /* MODAL */
   .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
   .modal-ov.open{display:flex}
   .modal{background:var(--surface);border-radius:var(--r);padding:2rem;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto}
@@ -99,17 +106,18 @@
   .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:1.5rem}
   .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:.75rem}
   .fg label{display:block;font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-  .fg input,.fg select{width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;background:var(--surface);color:var(--text);outline:none}
+  .fg input,.fg select,.fg textarea{width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;background:var(--surface);color:var(--text);outline:none}
   .fg input:focus,.fg select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,106,159,.1)}
+  .fg input[readonly]{background:var(--surface2);color:var(--muted)}
 
-  /* ── PROGRESS ── */
+  /* PROGRESS */
   .prog-bar{background:var(--surface2);border-radius:20px;height:7px;overflow:hidden;margin-top:5px}
   .prog-fill{height:100%;border-radius:20px;transition:width .4s}
 
-  /* ── CHART ── */
+  /* CHART */
   .chart-wrap{position:relative;width:100%;height:240px}
 
-  /* ── RENDICONTO ── */
+  /* RENDICONTO */
   .ren-table{width:100%;font-size:12px;border-collapse:collapse}
   .ren-table th{background:var(--navy);color:#fff;padding:7px 8px;font-size:10px;text-align:center;white-space:nowrap}
   .ren-table th:first-child{text-align:left;min-width:160px}
@@ -118,14 +126,22 @@
   .ren-table .sec-row td{background:var(--blue-l);font-weight:700;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
   .ren-table .tot-row td{background:var(--amber-l);font-weight:700;font-size:13px}
 
-  /* ── LOADING ── */
+  /* LOADING */
   .loading{text-align:center;padding:2rem;color:var(--hint);font-size:13px}
   .empty{text-align:center;padding:2.5rem;color:var(--hint);font-size:13px}
+
+  /* FATTURE IN SCADENZA */
+  .scad-list{display:flex;flex-direction:column;gap:8px}
+  .scad-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--amber-l);border-radius:var(--r-sm);font-size:13px}
+  .scad-item .scad-info{display:flex;flex-direction:column;gap:2px}
+  .scad-item .scad-nome{font-weight:600}
+  .scad-item .scad-data{font-size:11px;color:var(--muted)}
+  .scad-item .scad-imp{font-weight:700;color:var(--amber)}
 </style>
 </head>
 <body>
 
-<!-- ═══ AUTH ═══ -->
+<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">
@@ -148,17 +164,19 @@
       <div class="field"><label>Nome</label><input id="r-nome" type="text" placeholder="Come ti chiami?"></div>
       <div class="field"><label>Username</label><input id="r-user" type="text" placeholder="Scegli un username" autocomplete="username"></div>
       <div class="field"><label>Password</label><input id="r-pass" type="password" placeholder="Minimo 8 caratteri" autocomplete="new-password"></div>
+      <div class="field"><label>Email <span style="font-weight:400;text-transform:none">(opzionale, per reminder)</span></label><input id="r-email" type="email" placeholder="tua@email.com"></div>
       <button class="btn-auth" onclick="doRegister()">Crea account</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ APP ═══ -->
+<!-- APP -->
 <div id="app-screen">
   <div class="topbar">
     <h1>&#x1F4CA; FinTrack</h1>
     <div class="topbar-right">
       <span class="user-badge" id="user-label"></span>
+      <button class="btn-settings" onclick="openModal('m-settings')" title="Impostazioni">&#x2699;</button>
       <button class="btn-logout" onclick="logout()">Esci</button>
     </div>
   </div>
@@ -168,6 +186,9 @@
     <div class="tab" data-tab="spese">Spese</div>
     <div class="tab" data-tab="entrate">Entrate</div>
     <div class="tab" data-tab="carte">Carte</div>
+    <div class="tab" data-tab="conti">Conti</div>
+    <div class="tab" data-tab="fatture">Fatture</div>
+    <div class="tab" data-tab="pagamenti">Pagamenti</div>
     <div class="tab" data-tab="rendiconto">Rendiconto</div>
   </div>
 
@@ -175,12 +196,16 @@
   <div class="page active" id="page-dashboard">
     <div class="kpi-grid" id="kpi-grid"><div class="loading">Caricamento...</div></div>
     <div class="row2">
-      <div class="card"><div class="card-hdr"><h3>Flusso Entrate / Uscite</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-flussi" role="img" aria-label="Entrate vs uscite mensili">Grafico entrate vs uscite.</canvas></div></div></div>
-      <div class="card"><div class="card-hdr"><h3>Spese per Categoria</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-cat" role="img" aria-label="Spese per categoria">Grafico categorie.</canvas></div></div></div>
+      <div class="card"><div class="card-hdr"><h3>Flusso Entrate / Uscite</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-flussi">Grafico entrate vs uscite.</canvas></div></div></div>
+      <div class="card"><div class="card-hdr"><h3>Spese per Categoria</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-cat">Grafico categorie.</canvas></div></div></div>
     </div>
     <div class="row2">
       <div class="card"><div class="card-hdr"><h3>Abbonamenti Attivi</h3><span class="pill pill-blue" id="dash-abb-cnt">0</span></div><div class="card-body tw"><table><thead><tr><th>Servizio</th><th>Carta</th><th>Freq.</th><th>€/mese</th></tr></thead><tbody id="dash-abb-tbody"></tbody></table></div></div>
       <div class="card"><div class="card-hdr"><h3>Utilizzo Carte</h3></div><div class="card-body" id="dash-carte-body"></div></div>
+    </div>
+    <div class="row2" style="margin-bottom:0">
+      <div class="card"><div class="card-hdr"><h3>Fatture in scadenza (7gg)</h3></div><div class="card-body" id="dash-scadenza-body"><div class="empty">Nessuna fattura in scadenza</div></div></div>
+      <div></div>
     </div>
   </div>
 
@@ -208,6 +233,35 @@
     <div class="card tw"><table><thead><tr><th>Nome</th><th>Banca</th><th>Ultime 4</th><th>Tipo</th><th>Limite</th><th>Saldo usato</th><th>Utilizzo</th><th>Scadenza</th><th></th></tr></thead><tbody id="carte-tbody"></tbody><tfoot><tr class="tr-tot" id="carte-tfoot"></tr></tfoot></table></div>
   </div>
 
+  <!-- CONTI -->
+  <div class="page" id="page-conti">
+    <div class="action-bar"><span class="sec-title">Conti Bancari</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-conto')">+ Aggiungi</button></div>
+    <div class="card tw"><table><thead><tr><th>Nome</th><th>Banca</th><th>IBAN</th><th>Tipo</th><th>Saldo</th><th>Valuta</th><th></th></tr></thead><tbody id="conti-tbody"></tbody><tfoot><tr class="tr-tot" id="conti-tfoot"></tr></tfoot></table></div>
+  </div>
+
+  <!-- FATTURE -->
+  <div class="page" id="page-fatture">
+    <div class="action-bar"><span class="sec-title">Fatture</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-fattura')">+ Aggiungi</button></div>
+    <div class="filter-bar" id="fatture-filter-tipo">
+      <span class="fpill active" data-tipo="tutte">Tutte</span>
+      <span class="fpill" data-tipo="emessa">Emesse</span>
+      <span class="fpill" data-tipo="ricevuta">Ricevute</span>
+    </div>
+    <div class="filter-bar" id="fatture-filter-stato">
+      <span class="fpill active" data-stato="tutte">Tutte</span>
+      <span class="fpill" data-stato="non_pagata">Non pagate</span>
+      <span class="fpill" data-stato="pagata">Pagate</span>
+      <span class="fpill" data-stato="scaduta">Scadute</span>
+    </div>
+    <div class="card tw"><table><thead><tr><th>N°</th><th>Tipo</th><th>Controparte</th><th>Imponibile</th><th>IVA%</th><th>Totale</th><th>Emissione</th><th>Scadenza</th><th>Stato</th><th></th></tr></thead><tbody id="fatture-tbody"></tbody></table></div>
+  </div>
+
+  <!-- PAGAMENTI -->
+  <div class="page" id="page-pagamenti">
+    <div class="action-bar"><span class="sec-title">Pagamenti</span></div>
+    <div class="card tw"><table><thead><tr><th>Data</th><th>Fattura</th><th>Conto</th><th>Importo</th><th>Metodo</th><th></th></tr></thead><tbody id="pagamenti-tbody"></tbody></table></div>
+  </div>
+
   <!-- RENDICONTO -->
   <div class="page" id="page-rendiconto">
     <div class="action-bar"><span class="sec-title">Rendiconto Economico-Finanziario</span><div style="flex:1"></div><span class="tag">&#x26A1; Aggiornamento automatico</span></div>
@@ -215,7 +269,9 @@
   </div>
 </div>
 
-<!-- ═══ MODALS ═══ -->
+<!-- MODALS -->
+
+<!-- Abbonamento -->
 <div class="modal-ov" id="m-abb">
   <div class="modal"><h2>Nuovo Abbonamento</h2>
     <div class="form-row"><div class="fg"><label>Servizio</label><input id="ab-n" placeholder="es. Netflix"></div><div class="fg"><label>Categoria</label><select id="ab-c"><option>Streaming</option><option>Musica</option><option>Produttività</option><option>Cloud</option><option>Design</option><option>Fitness</option><option>News</option><option>Altro</option></select></div></div>
@@ -226,16 +282,18 @@
   </div>
 </div>
 
+<!-- Spesa -->
 <div class="modal-ov" id="m-spesa">
   <div class="modal"><h2>Nuova Spesa</h2>
     <div class="form-row"><div class="fg"><label>Data</label><input id="sp-d" type="date"></div><div class="fg"><label>Importo (€)</label><input id="sp-i" type="number" step="0.01" placeholder="0.00"></div></div>
     <div class="form-row"><div class="fg"><label>Descrizione</label><input id="sp-de" placeholder="Descrizione"></div><div class="fg"><label>Categoria</label><select id="sp-c"><option>Alimentari</option><option>Trasporti</option><option>Salute</option><option>Abbigliamento</option><option>Casa</option><option>Ristoranti</option><option>Tecnologia</option><option>Formazione</option><option>Intrattenimento</option><option>Viaggi</option><option>Utenze</option><option>Abbonamenti</option><option>Altro</option></select></div></div>
     <div class="form-row"><div class="fg"><label>Fornitore</label><input id="sp-fo" placeholder="Nome"></div><div class="fg"><label>Carta</label><input id="sp-cc" placeholder="Visa xxxx-1234"></div></div>
-    <div class="form-row"><div class="fg"><label>Deducibile</label><select id="sp-de2"><option>No</option><option>Sì</option></select></div><div class="fg"><label>Note</label><input id="sp-no" placeholder="Facoltativo"></div></div>
+    <div class="form-row"><div class="fg"><label>Deducibile</label><select id="sp-de2"><option>No</option><option>Si</option></select></div><div class="fg"><label>Note</label><input id="sp-no" placeholder="Facoltativo"></div></div>
     <div class="modal-footer"><button class="btn" onclick="closeModal('m-spesa')">Annulla</button><button class="btn btn-primary" onclick="saveSpesa()">Salva</button></div>
   </div>
 </div>
 
+<!-- Entrata -->
 <div class="modal-ov" id="m-entrata">
   <div class="modal"><h2>Nuova Entrata</h2>
     <div class="form-row"><div class="fg"><label>Data</label><input id="en-d" type="date"></div><div class="fg"><label>Importo (€)</label><input id="en-i" type="number" step="0.01" placeholder="0.00"></div></div>
@@ -246,6 +304,7 @@
   </div>
 </div>
 
+<!-- Carta -->
 <div class="modal-ov" id="m-carta">
   <div class="modal"><h2>Nuova Carta / Metodo di Pagamento</h2>
     <div class="form-row"><div class="fg"><label>Nome carta</label><input id="cc-n" placeholder="Visa Classica"></div><div class="fg"><label>Banca</label><input id="cc-b" placeholder="Banca Sella"></div></div>
@@ -256,13 +315,59 @@
   </div>
 </div>
 
+<!-- Conto -->
+<div class="modal-ov" id="m-conto">
+  <div class="modal"><h2>Nuovo Conto</h2>
+    <div class="form-row"><div class="fg"><label>Nome *</label><input id="cn-n" placeholder="Conto principale"></div><div class="fg"><label>Banca</label><input id="cn-b" placeholder="Intesa Sanpaolo"></div></div>
+    <div class="form-row"><div class="fg"><label>IBAN</label><input id="cn-iban" placeholder="IT60 X054 ..."></div><div class="fg"><label>Tipo</label><select id="cn-t"><option>Corrente</option><option>Risparmio</option><option>Investimento</option><option>Altro</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Saldo (€)</label><input id="cn-s" type="number" step="0.01" placeholder="0.00"></div><div class="fg"><label>Valuta</label><select id="cn-v"><option>EUR</option><option>USD</option><option>GBP</option><option>CHF</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Note</label><input id="cn-no" placeholder="Facoltativo"></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-conto')">Annulla</button><button class="btn btn-primary" onclick="saveConti()">Salva</button></div>
+  </div>
+</div>
+
+<!-- Fattura -->
+<div class="modal-ov" id="m-fattura">
+  <div class="modal"><h2>Nuova Fattura</h2>
+    <div class="form-row"><div class="fg"><label>Tipo *</label><select id="ft-tipo"><option value="ricevuta">Ricevuta</option><option value="emessa">Emessa</option></select></div><div class="fg"><label>Numero</label><input id="ft-num" placeholder="es. 2024/001"></div></div>
+    <div class="form-row"><div class="fg"><label>Controparte *</label><input id="ft-cp" placeholder="Nome cliente/fornitore"></div><div class="fg"><label>Stato</label><select id="ft-stato"><option value="non_pagata">Non pagata</option><option value="pagata">Pagata</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Data emissione</label><input id="ft-emis" type="date"></div><div class="fg"><label>Data scadenza</label><input id="ft-scad" type="date"></div></div>
+    <div class="form-row"><div class="fg"><label>Imponibile (€) *</label><input id="ft-imp" type="number" step="0.01" placeholder="0.00" oninput="calcTotFattura()"></div><div class="fg"><label>IVA %</label><input id="ft-iva" type="number" step="1" value="22" oninput="calcTotFattura()"></div></div>
+    <div class="form-row"><div class="fg"><label>Totale (€)</label><input id="ft-tot" type="number" step="0.01" readonly placeholder="auto"></div><div class="fg"><label>Conto</label><select id="ft-conto"><option value="">-- Nessun conto --</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Note</label><input id="ft-no" placeholder="Facoltativo"></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-fattura')">Annulla</button><button class="btn btn-primary" onclick="saveFattura()">Salva</button></div>
+  </div>
+</div>
+
+<!-- Paga fattura -->
+<div class="modal-ov" id="m-paga">
+  <div class="modal"><h2>Registra Pagamento</h2>
+    <div id="m-paga-info" style="background:var(--surface2);border-radius:var(--r-sm);padding:12px;margin-bottom:1rem;font-size:13px"></div>
+    <div class="form-row"><div class="fg"><label>Conto</label><select id="pg-conto"><option value="">-- Nessun conto --</option></select></div><div class="fg"><label>Data pagamento</label><input id="pg-data" type="date"></div></div>
+    <div class="form-row"><div class="fg"><label>Metodo</label><select id="pg-metodo"><option>Bonifico</option><option>Carta</option><option>Contanti</option><option>Assegno</option></select></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-paga')">Annulla</button><button class="btn btn-primary" onclick="submitPaga()">Conferma pagamento</button></div>
+  </div>
+</div>
+
+<!-- Impostazioni -->
+<div class="modal-ov" id="m-settings">
+  <div class="modal"><h2>&#x2699; Impostazioni</h2>
+    <div class="form-row"><div class="fg"><label>Email reminder</label><input id="st-email" type="email" placeholder="tua@email.com"></div></div>
+    <div class="form-row"><div class="fg"><label>Giorni anticipo reminder (1-30)</label><input id="st-days" type="number" min="1" max="30" placeholder="3"></div></div>
+    <p style="font-size:12px;color:var(--muted);margin-top:.5rem">Ricevi una email di promemoria per le fatture in scadenza nei prossimi N giorni.</p>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-settings')">Annulla</button><button class="btn btn-primary" onclick="saveSettings()">Salva</button></div>
+  </div>
+</div>
+
 <script>
 const API = '';
 let token = localStorage.getItem('ft_token') || '';
-let state = { abbonamenti:[], spese:[], entrate:[], carte:[] };
+let state = { abbonamenti:[], spese:[], entrate:[], carte:[], conti:[], fatture:[], pagamenti:[], dashboard:{} };
 let chartF = null, chartC = null;
+let pagaFatturaId = null;
+let fattureFilter = { tipo: 'tutte', stato: 'tutte' };
 
-// ── helpers ────────────────────────────────────────────────────
+// helpers
 const $ = id => document.getElementById(id);
 const fmt = n => (n||0).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
 const fmtPct = n => (n*100).toFixed(1)+'%';
@@ -274,6 +379,7 @@ function mensile(a) {
   return 0;
 }
 function mIdx(d){ if(!d) return -1; return new Date(d).getMonth(); }
+const todayStr = () => new Date().toISOString().split('T')[0];
 
 async function api(method, path, body) {
   const r = await fetch(API+path, {
@@ -285,7 +391,7 @@ async function api(method, path, body) {
   return data;
 }
 
-// ── AUTH ───────────────────────────────────────────────────────
+// AUTH
 document.querySelectorAll('.auth-tab').forEach(t => {
   t.addEventListener('click', () => {
     document.querySelectorAll('.auth-tab').forEach(x=>x.classList.remove('active'));
@@ -310,7 +416,7 @@ async function doLogin() {
 async function doRegister() {
   if($('r-pass').value.length < 8){ showErr('Password di almeno 8 caratteri'); return; }
   try {
-    const d = await api('POST','/api/register',{username:$('r-user').value.trim(),password:$('r-pass').value,nome:$('r-nome').value.trim()});
+    const d = await api('POST','/api/register',{username:$('r-user').value.trim(),password:$('r-pass').value,nome:$('r-nome').value.trim(),email:$('r-email').value.trim()||undefined});
     token = d.token; localStorage.setItem('ft_token',token);
     $('user-label').textContent = d.nome || d.username;
     showApp();
@@ -319,7 +425,7 @@ async function doRegister() {
 
 function logout(){ token=''; localStorage.removeItem('ft_token'); location.reload(); }
 
-// ── APP ────────────────────────────────────────────────────────
+// APP
 async function showApp() {
   $('auth-screen').style.display='none';
   $('app-screen').style.display='block';
@@ -328,13 +434,17 @@ async function showApp() {
 }
 
 async function loadAll() {
-  const [a,s,e,c] = await Promise.all([
+  const [a,s,e,c,co,f,p,dash] = await Promise.all([
     api('GET','/api/abbonamenti'),
     api('GET','/api/spese'),
     api('GET','/api/entrate'),
-    api('GET','/api/carte')
+    api('GET','/api/carte'),
+    api('GET','/api/conti'),
+    api('GET','/api/fatture'),
+    api('GET','/api/pagamenti'),
+    api('GET','/api/dashboard')
   ]);
-  state = {abbonamenti:a, spese:s, entrate:e, carte:c};
+  state = {abbonamenti:a, spese:s, entrate:e, carte:c, conti:co, fatture:f, pagamenti:p, dashboard:dash};
 }
 
 function renderAll() {
@@ -343,6 +453,9 @@ function renderAll() {
   renderSpese();
   renderEntrate();
   renderCarte();
+  renderConti();
+  renderFatture();
+  renderPagamenti();
   renderRendiconto();
 }
 
@@ -355,189 +468,349 @@ function renderDashboard() {
   const saldo = totE - uscite;
   const totLim = state.carte.reduce((s,c)=>s+(+c.lim||0),0);
   const totSCC = state.carte.reduce((s,c)=>s+(+c.saldo||0),0);
+  const dash = state.dashboard;
 
-  $('kpi-grid').innerHTML = [
+  const kpis = [
     {l:'Entrate Totali', v:fmt(totE), cls:'green', s:''},
     {l:'Uscite Totali', v:fmt(uscite), cls:'red', s:''},
     {l:'Saldo Netto', v:fmt(saldo), cls:saldo>=0?'green':'red', s:''},
+    {l:'Saldo Conti', v:fmt(dash.saldoConti||0), cls:'blue', s:''},
     {l:'Abbonamenti/mese', v:fmt(costoM), cls:'blue', s:fmt(costoM*12)+'/anno'},
     {l:'Abb. Attivi', v:attivi.length, cls:'purple', s:''},
-    {l:'Utilizzo Carte', v:totLim>0?fmtPct(totSCC/totLim):'—', cls:'amber', s:fmt(totSCC)+' / '+fmt(totLim)},
-  ].map(k=>`<div class="kpi ${k.cls}"><div class="lbl">${k.l}</div><div class="val">${k.v}</div>${k.s?`<div class="sub">${k.s}</div>`:''}</div>`).join('');
+    {l:'Utilizzo Carte', v:totLim>0?fmtPct(totSCC/totLim):'&mdash;', cls:'amber', s:fmt(totSCC)+' / '+fmt(totLim)},
+    {l:'Fatture aperte', v:(dash.fattureAperte&&dash.fattureAperte.count)||0, cls:'amber', s:dash.fattureAperte?fmt(dash.fattureAperte.tot):''},
+    {l:'Fatture scadute', v:(dash.fattureScadute||0), cls:dash.fattureScadute>0?'red':'', s:''}
+  ];
+  $('kpi-grid').innerHTML = kpis.map(function(k){
+    return '<div class="kpi '+k.cls+'"><div class="lbl">'+k.l+'</div><div class="val">'+k.v+'</div>'+(k.s?'<div class="sub">'+k.s+'</div>':'')+'</div>';
+  }).join('');
 
   $('dash-abb-cnt').textContent = attivi.length+' attivi';
-  $('dash-abb-tbody').innerHTML = attivi.slice(0,6).map(a=>
-    `<tr><td><b>${a.nome}</b></td><td><span class="tag">${a.carta||'—'}</span></td><td>${a.freq}</td><td><b>${fmt(mensile(a))}</b></td></tr>`
-  ).join('') || '<tr><td colspan="4" class="empty">Nessun abbonamento</td></tr>';
+  $('dash-abb-tbody').innerHTML = attivi.slice(0,6).map(function(a){
+    return '<tr><td><b>'+a.nome+'</b></td><td><span class="tag">'+(a.carta||'&mdash;')+'</span></td><td>'+a.freq+'</td><td><b>'+fmt(mensile(a))+'</b></td></tr>';
+  }).join('') || '<tr><td colspan="4" class="empty">Nessun abbonamento</td></tr>';
 
-  $('dash-carte-body').innerHTML = state.carte.map(c=>{
-    const p = +c.lim>0 ? (+c.saldo)/(+c.lim) : 0;
-    const col = p>.8?'var(--red)':p>.5?'var(--amber)':'var(--green)';
-    return `<div style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px">
-        <span><b>${c.nome}</b> <span class="tag">${c.num||'—'}</span></span>
-        <span style="color:${col};font-weight:700">${fmtPct(p)}</span>
-      </div>
-      <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(p*100,100).toFixed(1)}%;background:${col}"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--hint);margin-top:3px"><span>${fmt(+c.saldo)} usati</span><span>Limite ${fmt(+c.lim)}</span></div>
-    </div>`;
+  $('dash-carte-body').innerHTML = state.carte.map(function(c){
+    var p = +c.lim>0 ? (+c.saldo)/(+c.lim) : 0;
+    var col = p>.8?'var(--red)':p>.5?'var(--amber)':'var(--green)';
+    return '<div style="margin-bottom:14px">'+
+      '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px">'+
+      '<span><b>'+c.nome+'</b> <span class="tag">'+(c.num||'&mdash;')+'</span></span>'+
+      '<span style="color:'+col+';font-weight:700">'+fmtPct(p)+'</span></div>'+
+      '<div class="prog-bar"><div class="prog-fill" style="width:'+Math.min(p*100,100).toFixed(1)+'%;background:'+col+'"></div></div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--hint);margin-top:3px"><span>'+fmt(+c.saldo)+' usati</span><span>Limite '+fmt(+c.lim)+'</span></div></div>';
   }).join('') || '<div class="empty">Nessuna carta registrata</div>';
+
+  var inScad = (dash.inScadenza||[]);
+  if(inScad.length) {
+    $('dash-scadenza-body').innerHTML = '<div class="scad-list">'+inScad.map(function(f){
+      return '<div class="scad-item">'+
+        '<div class="scad-info"><div class="scad-nome">'+(f.controparte||'&mdash;')+' <span class="tag">'+(f.numero||'&mdash;')+'</span></div>'+
+        '<div class="scad-data">Scadenza: '+(f.data_scadenza||'&mdash;')+'</div></div>'+
+        '<div class="scad-imp">'+fmt(f.importo_totale)+'</div></div>';
+    }).join('')+'</div>';
+  } else {
+    $('dash-scadenza-body').innerHTML = '<div class="empty">Nessuna fattura in scadenza nei prossimi 7 giorni</div>';
+  }
 
   buildCharts(attivi, costoM);
 }
 
 function buildCharts(attivi, costoM) {
-  const months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  const eM=new Array(12).fill(0), sM=new Array(12).fill(0);
-  state.entrate.forEach(e=>{const m=mIdx(e.data);if(m>=0)eM[m]+=(+e.imp||0)});
-  state.spese.forEach(s=>{const m=mIdx(s.data);if(m>=0)sM[m]+=(+s.imp||0)});
-  const uM = sM.map(v=>v+costoM);
+  var months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  var eM=new Array(12).fill(0), sM=new Array(12).fill(0);
+  state.entrate.forEach(function(e){var m=mIdx(e.data);if(m>=0)eM[m]+=(+e.imp||0)});
+  state.spese.forEach(function(s){var m=mIdx(s.data);if(m>=0)sM[m]+=(+s.imp||0)});
+  var uM = sM.map(function(v){return v+costoM});
   if(chartF) chartF.destroy();
   chartF = new Chart($('chart-flussi'),{type:'bar',data:{labels:months,datasets:[
     {label:'Entrate',data:eM,backgroundColor:'rgba(39,174,96,.7)',borderRadius:4},
     {label:'Uscite',data:uM,backgroundColor:'rgba(224,90,74,.7)',borderRadius:4}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:v=>v+'€'}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:function(v){return v+'€'}}}}}});
 
-  const catMap={};
-  state.spese.forEach(s=>{catMap[s.cat]=(catMap[s.cat]||0)+(+s.imp||0)});
-  attivi.forEach(a=>{catMap['Abbonamenti']=(catMap['Abbonamenti']||0)+mensile(a)});
-  const labs=Object.keys(catMap), vals=Object.values(catMap);
-  const pal=['#2D6A9F','#27AE60','#E05A4A','#F39C12','#8E44AD','#16A085','#D35400','#2C3E50','#1ABC9C','#E74C3C'];
+  var catMap={};
+  state.spese.forEach(function(s){catMap[s.cat]=(catMap[s.cat]||0)+(+s.imp||0)});
+  attivi.forEach(function(a){catMap['Abbonamenti']=(catMap['Abbonamenti']||0)+mensile(a)});
+  var labs=Object.keys(catMap), vals=Object.values(catMap);
+  var pal=['#2D6A9F','#27AE60','#E05A4A','#F39C12','#8E44AD','#16A085','#D35400','#2C3E50','#1ABC9C','#E74C3C'];
   if(chartC) chartC.destroy();
   if(!labs.length){$('chart-cat').parentElement.innerHTML='<div class="empty">Nessuna spesa inserita</div>';return;}
   chartC = new Chart($('chart-cat'),{type:'doughnut',data:{labels:labs,datasets:[{data:vals,backgroundColor:pal.slice(0,labs.length),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}}}}});
 }
 
 function renderAbb() {
-  const tb = $('abb-tbody');
+  var tb=$('abb-tbody');
   if(!state.abbonamenti.length){tb.innerHTML='<tr><td colspan="9"><div class="empty">Nessun abbonamento</div></td></tr>';$('abb-tfoot').innerHTML='';return;}
-  tb.innerHTML = state.abbonamenti.map(a=>{
-    const bc=a.stato==='Attivo'?'pill-green':a.stato==='Sospeso'?'pill-amber':'pill-red';
-    return `<tr><td><b>${a.nome}</b></td><td><span class="tag">${a.cat||'—'}</span></td><td>${fmt(+a.imp)}</td><td>${a.freq}</td><td>${a.rinnovo||'—'}</td><td style="font-size:11px">${a.carta||'—'}</td><td><span class="pill ${bc}">${a.stato}</span></td><td><b>${fmt(mensile(a))}</b></td><td><button class="btn btn-sm" onclick="del('abbonamenti','${a.id}')">&#x1F5D1;</button></td></tr>`;
+  tb.innerHTML=state.abbonamenti.map(function(a){
+    var bc=a.stato==='Attivo'?'pill-green':a.stato==='Sospeso'?'pill-amber':'pill-red';
+    return '<tr><td><b>'+a.nome+'</b></td><td><span class="tag">'+(a.cat||'&mdash;')+'</span></td><td>'+fmt(+a.imp)+'</td><td>'+a.freq+'</td><td>'+(a.rinnovo||'&mdash;')+'</td><td style="font-size:11px">'+(a.carta||'&mdash;')+'</td><td><span class="pill '+bc+'">'+a.stato+'</span></td><td><b>'+fmt(mensile(a))+'</b></td><td><button class="btn btn-sm" onclick="del(\'abbonamenti\',\''+a.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
-  const tot=state.abbonamenti.filter(a=>a.stato==='Attivo').reduce((s,a)=>s+mensile(a),0);
-  $('abb-tfoot').innerHTML=`<td colspan="7"><b>Totale mensile attivi</b></td><td><b>${fmt(tot)}</b></td><td></td>`;
+  var tot=state.abbonamenti.filter(function(a){return a.stato==='Attivo'}).reduce(function(s,a){return s+mensile(a)},0);
+  $('abb-tfoot').innerHTML='<td colspan="7"><b>Totale mensile attivi</b></td><td><b>'+fmt(tot)+'</b></td><td></td>';
 }
 
 function renderSpese() {
-  const tb=$('spese-tbody');
+  var tb=$('spese-tbody');
   if(!state.spese.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Nessuna spesa</div></td></tr>';$('spese-tfoot').innerHTML='';return;}
-  tb.innerHTML=state.spese.map(s=>`<tr><td>${s.data||'—'}</td><td>${s.desc||s.de||'—'}</td><td><span class="tag">${s.cat}</span></td><td>${s.forn||s.fo||'—'}</td><td><b>${fmt(+s.imp)}</b></td><td style="font-size:11px">${s.carta||s.cc||'—'}</td><td><span class="pill ${s.deduct==='Sì'?'pill-green':'pill-red'}">${s.deduct||'No'}</span></td><td><button class="btn btn-sm" onclick="del('spese','${s.id}')">&#x1F5D1;</button></td></tr>`).join('');
-  const tot=state.spese.reduce((s,e)=>s+(+e.imp||0),0);
-  $('spese-tfoot').innerHTML=`<td colspan="4"><b>Totale spese</b></td><td><b>${fmt(tot)}</b></td><td colspan="3"></td>`;
+  tb.innerHTML=state.spese.map(function(s){
+    return '<tr><td>'+(s.data||'&mdash;')+'</td><td>'+(s.desc||'&mdash;')+'</td><td><span class="tag">'+s.cat+'</span></td><td>'+(s.forn||'&mdash;')+'</td><td><b>'+fmt(+s.imp)+'</b></td><td style="font-size:11px">'+(s.carta||'&mdash;')+'</td><td><span class="pill '+(s.deduct==='Si'?'pill-green':'pill-red')+'">'+(s.deduct||'No')+'</span></td><td><button class="btn btn-sm" onclick="del(\'spese\',\''+s.id+'\')">&#x1F5D1;</button></td></tr>';
+  }).join('');
+  var tot=state.spese.reduce(function(s,e){return s+(+e.imp||0)},0);
+  $('spese-tfoot').innerHTML='<td colspan="4"><b>Totale spese</b></td><td><b>'+fmt(tot)+'</b></td><td colspan="3"></td>';
 }
 
 function renderEntrate() {
-  const tb=$('entrate-tbody');
+  var tb=$('entrate-tbody');
   if(!state.entrate.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Nessuna entrata</div></td></tr>';$('entrate-tfoot').innerHTML='';return;}
-  tb.innerHTML=state.entrate.map(e=>`<tr><td>${e.data||'—'}</td><td>${e.desc||e.de||'—'}</td><td><span class="tag">${e.cat}</span></td><td>${e.prov||e.pr||'—'}</td><td><b class="pos">${fmt(+e.imp)}</b></td><td style="font-size:11px">${e.conto||e.co||'—'}</td><td>${e.per||'—'}</td><td><button class="btn btn-sm" onclick="del('entrate','${e.id}')">&#x1F5D1;</button></td></tr>`).join('');
-  const tot=state.entrate.reduce((s,e)=>s+(+e.imp||0),0);
-  $('entrate-tfoot').innerHTML=`<td colspan="4"><b>Totale entrate</b></td><td><b class="pos">${fmt(tot)}</b></td><td colspan="3"></td>`;
+  tb.innerHTML=state.entrate.map(function(e){
+    return '<tr><td>'+(e.data||'&mdash;')+'</td><td>'+(e.desc||'&mdash;')+'</td><td><span class="tag">'+e.cat+'</span></td><td>'+(e.prov||'&mdash;')+'</td><td><b class="pos">'+fmt(+e.imp)+'</b></td><td style="font-size:11px">'+(e.conto||'&mdash;')+'</td><td>'+(e.per||'&mdash;')+'</td><td><button class="btn btn-sm" onclick="del(\'entrate\',\''+e.id+'\')">&#x1F5D1;</button></td></tr>';
+  }).join('');
+  var tot=state.entrate.reduce(function(s,e){return s+(+e.imp||0)},0);
+  $('entrate-tfoot').innerHTML='<td colspan="4"><b>Totale entrate</b></td><td><b class="pos">'+fmt(tot)+'</b></td><td colspan="3"></td>';
 }
 
 function renderCarte() {
-  const tb=$('carte-tbody');
+  var tb=$('carte-tbody');
   if(!state.carte.length){tb.innerHTML='<tr><td colspan="9"><div class="empty">Nessuna carta</div></td></tr>';$('carte-tfoot').innerHTML='';return;}
-  tb.innerHTML=state.carte.map(c=>{
-    const p=+c.lim>0?(+c.saldo)/(+c.lim):0;
-    const col=p>.8?'var(--red)':p>.5?'var(--amber)':'var(--green)';
-    return `<tr><td><b>${c.nome}</b></td><td>${c.banca||'—'}</td><td>xxxx-${c.num||'—'}</td><td><span class="tag">${c.tipo}</span></td><td>${fmt(+c.lim)}</td><td>${fmt(+c.saldo)}</td><td style="color:${col};font-weight:700">${fmtPct(p)}</td><td>${c.scad||'—'}</td><td><button class="btn btn-sm" onclick="del('carte','${c.id}')">&#x1F5D1;</button></td></tr>`;
+  tb.innerHTML=state.carte.map(function(c){
+    var p=+c.lim>0?(+c.saldo)/(+c.lim):0;
+    var col=p>.8?'var(--red)':p>.5?'var(--amber)':'var(--green)';
+    return '<tr><td><b>'+c.nome+'</b></td><td>'+(c.banca||'&mdash;')+'</td><td>xxxx-'+(c.num||'&mdash;')+'</td><td><span class="tag">'+c.tipo+'</span></td><td>'+fmt(+c.lim)+'</td><td>'+fmt(+c.saldo)+'</td><td style="color:'+col+';font-weight:700">'+fmtPct(p)+'</td><td>'+(c.scad||'&mdash;')+'</td><td><button class="btn btn-sm" onclick="del(\'carte\',\''+c.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
-  const tL=state.carte.reduce((s,c)=>s+(+c.lim||0),0), tS=state.carte.reduce((s,c)=>s+(+c.saldo||0),0);
-  $('carte-tfoot').innerHTML=`<td colspan="4"><b>Totale</b></td><td><b>${fmt(tL)}</b></td><td><b>${fmt(tS)}</b></td><td colspan="3"></td>`;
+  var tL=state.carte.reduce(function(s,c){return s+(+c.lim||0)},0), tS=state.carte.reduce(function(s,c){return s+(+c.saldo||0)},0);
+  $('carte-tfoot').innerHTML='<td colspan="4"><b>Totale</b></td><td><b>'+fmt(tL)+'</b></td><td><b>'+fmt(tS)+'</b></td><td colspan="3"></td>';
+}
+
+function renderConti() {
+  var tb=$('conti-tbody');
+  if(!state.conti.length){tb.innerHTML='<tr><td colspan="7"><div class="empty">Nessun conto</div></td></tr>';$('conti-tfoot').innerHTML='';return;}
+  tb.innerHTML=state.conti.map(function(c){
+    return '<tr><td><b>'+c.nome+'</b></td><td>'+(c.banca||'&mdash;')+'</td><td style="font-size:11px;font-family:monospace">'+(c.iban||'&mdash;')+'</td><td><span class="tag">'+(c.tipo||'Corrente')+'</span></td><td><b>'+fmt(+c.saldo)+'</b></td><td>'+(c.valuta||'EUR')+'</td><td><button class="btn btn-sm" onclick="del(\'conti\',\''+c.id+'\')">&#x1F5D1;</button></td></tr>';
+  }).join('');
+  var tot=state.conti.reduce(function(s,c){return s+(+c.saldo||0)},0);
+  $('conti-tfoot').innerHTML='<td colspan="4"><b>Saldo totale</b></td><td><b>'+fmt(tot)+'</b></td><td colspan="2"></td>';
+}
+
+function fatturaStatoPill(f) {
+  var oggi = todayStr();
+  if(f.stato==='pagata') return '<span class="pill pill-green">Pagata</span>';
+  if(f.data_scadenza && f.data_scadenza < oggi) return '<span class="pill pill-red">Scaduta</span>';
+  return '<span class="pill pill-amber">In attesa</span>';
+}
+
+function renderFatture() {
+  var tb=$('fatture-tbody');
+  var oggi = todayStr();
+  var lista = state.fatture.filter(function(f){
+    var okTipo = fattureFilter.tipo==='tutte' || f.tipo===fattureFilter.tipo;
+    var okStato = true;
+    if(fattureFilter.stato==='non_pagata') okStato = f.stato==='non_pagata' && (!f.data_scadenza || f.data_scadenza >= oggi);
+    else if(fattureFilter.stato==='pagata') okStato = f.stato==='pagata';
+    else if(fattureFilter.stato==='scaduta') okStato = f.stato==='non_pagata' && f.data_scadenza && f.data_scadenza < oggi;
+    return okTipo && okStato;
+  });
+  if(!lista.length){tb.innerHTML='<tr><td colspan="10"><div class="empty">Nessuna fattura</div></td></tr>';return;}
+  tb.innerHTML=lista.map(function(f){
+    var tipoPill = f.tipo==='emessa'?'<span class="pill pill-blue">Emessa</span>':'<span class="pill pill-amber">Ricevuta</span>';
+    var pagaBtn = f.stato!=='pagata' ? '<button class="btn btn-sm btn-primary" onclick="apriFatturaPaga(\''+f.id+'\')">Paga</button> ' : '';
+    return '<tr><td>'+(f.numero||'&mdash;')+'</td><td>'+tipoPill+'</td><td>'+(f.controparte||'&mdash;')+'</td><td>'+fmt(f.importo)+'</td><td>'+(f.iva||22)+'%</td><td><b>'+fmt(f.importo_totale)+'</b></td><td>'+(f.data_emissione||'&mdash;')+'</td><td>'+(f.data_scadenza||'&mdash;')+'</td><td>'+fatturaStatoPill(f)+'</td><td>'+pagaBtn+'<button class="btn btn-sm" onclick="del(\'fatture\',\''+f.id+'\')">&#x1F5D1;</button></td></tr>';
+  }).join('');
+}
+
+function renderPagamenti() {
+  var tb=$('pagamenti-tbody');
+  if(!state.pagamenti.length){tb.innerHTML='<tr><td colspan="6"><div class="empty">Nessun pagamento</div></td></tr>';return;}
+  tb.innerHTML=state.pagamenti.map(function(p){
+    var fattura = state.fatture.find(function(f){return f.id===p.fattura_id});
+    var conto = state.conti.find(function(c){return c.id===p.conto_id});
+    var fatturaLabel = fattura ? ((fattura.numero||'#')+' '+fattura.controparte) : (p.fattura_id||'&mdash;');
+    var contoLabel = conto ? conto.nome : (p.conto_id||'&mdash;');
+    return '<tr><td>'+(p.data||'&mdash;')+'</td><td>'+fatturaLabel+'</td><td>'+contoLabel+'</td><td><b>'+fmt(+p.importo)+'</b></td><td>'+(p.metodo||'&mdash;')+'</td><td><button class="btn btn-sm" onclick="del(\'pagamenti\',\''+p.id+'\')">&#x1F5D1;</button></td></tr>';
+  }).join('');
 }
 
 function renderRendiconto() {
-  const months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  const attivi=state.abbonamenti.filter(a=>a.stato==='Attivo');
-  const cm=attivi.reduce((s,a)=>s+mensile(a),0);
-  const eM=new Array(12).fill(0), sM=new Array(12).fill(0);
-  state.entrate.forEach(e=>{const m=mIdx(e.data);if(m>=0)eM[m]+=(+e.imp||0)});
-  state.spese.forEach(s=>{const m=mIdx(s.data);if(m>=0)sM[m]+=(+s.imp||0)});
-  const abbM=new Array(12).fill(cm);
-  const uTot=months.map((_,i)=>sM[i]+cm);
-  const sal=months.map((_,i)=>eM[i]-uTot[i]);
+  var months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  var attivi=state.abbonamenti.filter(function(a){return a.stato==='Attivo'});
+  var cm=attivi.reduce(function(s,a){return s+mensile(a)},0);
+  var eM=new Array(12).fill(0), sM=new Array(12).fill(0);
+  state.entrate.forEach(function(e){var m=mIdx(e.data);if(m>=0)eM[m]+=(+e.imp||0)});
+  state.spese.forEach(function(s){var m=mIdx(s.data);if(m>=0)sM[m]+=(+s.imp||0)});
+  var abbM=new Array(12).fill(cm);
+  var uTot=months.map(function(_,i){return sM[i]+cm});
+  var sal=months.map(function(_,i){return eM[i]-uTot[i]});
 
-  function row(label, vals, cls='') {
-    const tot=vals.reduce((a,b)=>a+b,0);
-    const isSaldo=cls.includes('sal');
-    const cells = vals.map(v=>'<td class="'+(isSaldo?(v>=0?'pos':'neg'):'')+'">'+fmt(v)+'</td>').join('');
-    const totCls = isSaldo?(tot>=0?'pos':'neg'):'';
+  function row(label, vals, cls) {
+    cls = cls || '';
+    var tot=vals.reduce(function(a,b){return a+b},0);
+    var isSaldo=cls.indexOf('sal')>=0;
+    var cells = vals.map(function(v){return '<td class="'+(isSaldo?(v>=0?'pos':'neg'):'')+'">'+fmt(v)+'</td>'}).join('');
+    var totCls = isSaldo?(tot>=0?'pos':'neg'):'';
     return '<tr class="'+cls+'"><td>'+label+'</td>'+cells+'<td class="'+totCls+'">'+fmt(tot)+'</td></tr>';
   }
 
   $('ren-tbody').innerHTML =
-    `<tr class="sec-row"><td colspan="14">&#x1F4B0; ENTRATE</td></tr>` + row('Entrate inserite', eM) +
-    `<tr class="sec-row"><td colspan="14">&#x1F4B8; USCITE</td></tr>` +
+    '<tr class="sec-row"><td colspan="14">&#x1F4B0; ENTRATE</td></tr>' + row('Entrate inserite', eM) +
+    '<tr class="sec-row"><td colspan="14">&#x1F4B8; USCITE</td></tr>' +
     row('Spese varie', sM) + row('Abbonamenti mensili', abbM) + row('Totale uscite', uTot, 'tot-row') +
-    `<tr class="sec-row"><td colspan="14">&#x2696;&#xFE0F; SALDO</td></tr>` + row('Saldo netto', sal, 'tot-row sal') +
-    `<tr class="sec-row"><td colspan="14">&#x1F504; ABBONAMENTI</td></tr>` +
-    `<tr><td>N° attivi</td>${months.map(()=>`<td>${attivi.length}</td>`).join('')}<td>${attivi.length}</td></tr>` +
+    '<tr class="sec-row"><td colspan="14">&#x2696;&#xFE0F; SALDO</td></tr>' + row('Saldo netto', sal, 'tot-row sal') +
+    '<tr class="sec-row"><td colspan="14">&#x1F504; ABBONAMENTI</td></tr>' +
+    '<tr><td>N° attivi</td>'+months.map(function(){return '<td>'+attivi.length+'</td>'}).join('')+'<td>'+attivi.length+'</td></tr>' +
     row('Costo mensile abb.', abbM) +
-    `<tr><td>Costo annuo abb.</td>${months.map(()=>'<td>—</td>').join('')}<td><b>${fmt(cm*12)}</b></td></tr>`;
+    '<tr><td>Costo annuo abb.</td>'+months.map(function(){return '<td>&mdash;</td>'}).join('')+'<td><b>'+fmt(cm*12)+'</b></td></tr>';
 }
 
-// ── CRUD ───────────────────────────────────────────────────────
+// CRUD SAVE
 async function saveAbb() {
-  const body={nome:$('ab-n').value.trim(),cat:$('ab-c').value,imp:+$('ab-i').value||0,freq:$('ab-f').value,rinnovo:$('ab-r').value,carta:$('ab-cc').value.trim(),stato:$('ab-s').value,note:$('ab-no').value.trim()};
+  var body={nome:$('ab-n').value.trim(),cat:$('ab-c').value,imp:+$('ab-i').value||0,freq:$('ab-f').value,rinnovo:$('ab-r').value,carta:$('ab-cc').value.trim(),stato:$('ab-s').value,note:$('ab-no').value.trim()};
   if(!body.nome){alert('Inserisci il nome del servizio');return;}
   await api('POST','/api/abbonamenti',body);
   closeModal('m-abb'); await loadAll(); renderAll();
 }
 async function saveSpesa() {
-  const body={data:$('sp-d').value,imp:+$('sp-i').value||0,desc:$('sp-de').value.trim(),cat:$('sp-c').value,forn:$('sp-fo').value.trim(),carta:$('sp-cc').value.trim(),deduct:$('sp-de2').value,note:$('sp-no').value.trim()};
+  var body={data:$('sp-d').value,imp:+$('sp-i').value||0,desc:$('sp-de').value.trim(),cat:$('sp-c').value,forn:$('sp-fo').value.trim(),carta:$('sp-cc').value.trim(),deduct:$('sp-de2').value,note:$('sp-no').value.trim()};
   if(!body.desc){alert('Inserisci una descrizione');return;}
   await api('POST','/api/spese',body);
   closeModal('m-spesa'); await loadAll(); renderAll();
 }
 async function saveEntrata() {
-  const body={data:$('en-d').value,imp:+$('en-i').value||0,desc:$('en-de').value.trim(),cat:$('en-c').value,prov:$('en-pr').value.trim(),conto:$('en-co').value.trim(),per:$('en-pe').value,note:$('en-no').value.trim()};
+  var body={data:$('en-d').value,imp:+$('en-i').value||0,desc:$('en-de').value.trim(),cat:$('en-c').value,prov:$('en-pr').value.trim(),conto:$('en-co').value.trim(),per:$('en-pe').value,note:$('en-no').value.trim()};
   if(!body.desc){alert('Inserisci una descrizione');return;}
   await api('POST','/api/entrate',body);
   closeModal('m-entrata'); await loadAll(); renderAll();
 }
 async function saveCarta() {
-  const body={nome:$('cc-n').value.trim(),banca:$('cc-b').value.trim(),num:$('cc-nu').value.trim(),tipo:$('cc-t').value,lim:+$('cc-l').value||0,saldo:+$('cc-s').value||0,scad:$('cc-sc').value.trim(),note:$('cc-no').value.trim()};
+  var body={nome:$('cc-n').value.trim(),banca:$('cc-b').value.trim(),num:$('cc-nu').value.trim(),tipo:$('cc-t').value,lim:+$('cc-l').value||0,saldo:+$('cc-s').value||0,scad:$('cc-sc').value.trim(),note:$('cc-no').value.trim()};
   if(!body.nome){alert('Inserisci il nome della carta');return;}
   await api('POST','/api/carte',body);
   closeModal('m-carta'); await loadAll(); renderAll();
 }
+async function saveConti() {
+  var body={nome:$('cn-n').value.trim(),banca:$('cn-b').value.trim(),iban:$('cn-iban').value.trim(),tipo:$('cn-t').value,saldo:+$('cn-s').value||0,valuta:$('cn-v').value,note:$('cn-no').value.trim()};
+  if(!body.nome){alert('Inserisci il nome del conto');return;}
+  await api('POST','/api/conti',body);
+  closeModal('m-conto'); await loadAll(); renderAll();
+}
+async function saveFattura() {
+  var imp = +$('ft-imp').value||0;
+  var iva = +$('ft-iva').value||22;
+  var body={tipo:$('ft-tipo').value,numero:$('ft-num').value.trim(),controparte:$('ft-cp').value.trim(),importo:imp,iva:iva,importo_totale:+(imp*(1+iva/100)).toFixed(2),data_emissione:$('ft-emis').value,data_scadenza:$('ft-scad').value,stato:$('ft-stato').value,conto_id:$('ft-conto').value||null,note:$('ft-no').value.trim()};
+  if(!body.controparte){alert('Inserisci la controparte');return;}
+  await api('POST','/api/fatture',body);
+  closeModal('m-fattura'); await loadAll(); renderAll();
+}
+
+function calcTotFattura() {
+  var imp = +$('ft-imp').value||0;
+  var iva = +$('ft-iva').value||22;
+  $('ft-tot').value = (imp*(1+iva/100)).toFixed(2);
+}
+
+function apriFatturaPaga(id) {
+  pagaFatturaId = id;
+  var fattura = state.fatture.find(function(f){return f.id===id});
+  if(!fattura) return;
+  var info = $('m-paga-info');
+  info.innerHTML = '<b>Fattura:</b> '+(fattura.numero||'&mdash;')+' &mdash; <b>Controparte:</b> '+(fattura.controparte||'&mdash;')+'<br>'+
+    '<b>Totale:</b> '+fmt(fattura.importo_totale)+' &mdash; <b>Scadenza:</b> '+(fattura.data_scadenza||'&mdash;');
+  var sel = $('pg-conto');
+  sel.innerHTML = '<option value="">-- Nessun conto --</option>';
+  state.conti.forEach(function(c){
+    var opt = document.createElement('option');
+    opt.value = c.id; opt.textContent = c.nome + ' (' + (c.valuta||'EUR') + ')';
+    sel.appendChild(opt);
+  });
+  $('pg-data').value = todayStr();
+  openModal('m-paga');
+}
+
+async function submitPaga() {
+  if(!pagaFatturaId) return;
+  var body = {conto_id:$('pg-conto').value||null, data:$('pg-data').value, metodo:$('pg-metodo').value};
+  await api('POST','/api/fatture/'+pagaFatturaId+'/paga',body);
+  closeModal('m-paga'); await loadAll(); renderAll();
+}
+
+async function saveSettings() {
+  var body = {email:$('st-email').value.trim()||null, reminder_days:+$('st-days').value||3};
+  await api('PATCH','/api/me/settings',body);
+  closeModal('m-settings');
+}
 
 async function del(resource, id) {
   if(!confirm('Eliminare questo elemento?')) return;
-  await api('DELETE',`/api/${resource}/${id}`);
+  await api('DELETE','/api/'+resource+'/'+id);
   await loadAll(); renderAll();
 }
 
-// ── TABS ───────────────────────────────────────────────────────
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+// TABS
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+    document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active')});
     t.classList.add('active');
     $('page-'+t.dataset.tab).classList.add('active');
   });
 });
 
-function openModal(id){
-  const today=new Date().toISOString().split('T')[0];
+// Filtri fatture
+document.querySelectorAll('#fatture-filter-tipo .fpill').forEach(function(p){
+  p.addEventListener('click',function(){
+    document.querySelectorAll('#fatture-filter-tipo .fpill').forEach(function(x){x.classList.remove('active')});
+    p.classList.add('active');
+    fattureFilter.tipo = p.dataset.tipo;
+    renderFatture();
+  });
+});
+document.querySelectorAll('#fatture-filter-stato .fpill').forEach(function(p){
+  p.addEventListener('click',function(){
+    document.querySelectorAll('#fatture-filter-stato .fpill').forEach(function(x){x.classList.remove('active')});
+    p.classList.add('active');
+    fattureFilter.stato = p.dataset.stato;
+    renderFatture();
+  });
+});
+
+function populateContiDropdown(selId) {
+  var sel = $(selId);
+  sel.innerHTML = '<option value="">-- Nessun conto --</option>';
+  state.conti.forEach(function(c){
+    var opt = document.createElement('option');
+    opt.value = c.id; opt.textContent = c.nome + ' (' + (c.valuta||'EUR') + ')';
+    sel.appendChild(opt);
+  });
+}
+
+function openModal(id) {
+  var today = todayStr();
   if(id==='m-spesa') $('sp-d').value=today;
   if(id==='m-entrata') $('en-d').value=today;
+  if(id==='m-fattura') {
+    $('ft-emis').value=today;
+    calcTotFattura();
+    populateContiDropdown('ft-conto');
+  }
+  if(id==='m-settings') {
+    api('GET','/api/me').then(function(me){
+      $('st-email').value = me.email||'';
+      $('st-days').value = me.reminder_days||3;
+    });
+  }
   $(id).classList.add('open');
 }
 function closeModal(id){ $(id).classList.remove('open'); }
-document.querySelectorAll('.modal-ov').forEach(m=>{
-  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+document.querySelectorAll('.modal-ov').forEach(function(m){
+  m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('open');});
 });
 
-// ── BOOT ───────────────────────────────────────────────────────
-(async () => {
+// BOOT
+(async function() {
   if(token) {
     try {
-      const me = await api('GET','/api/me');
+      var me = await api('GET','/api/me');
       $('user-label').textContent = me.nome || me.username;
       await showApp();
-    } catch { token=''; localStorage.removeItem('ft_token'); }
+    } catch(e) { token=''; localStorage.removeItem('ft_token'); }
   }
 })();
 </script>
