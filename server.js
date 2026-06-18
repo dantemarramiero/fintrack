@@ -117,16 +117,13 @@ function auth(req, res, next) {
 
 // ── Auth routes ────────────────────────────────────────────────
 app.post('/api/register', async (req, res) => {
-  const { username, password, nome, email } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Username e password obbligatori' });
-  const existing = db.prepare('SELECT id FROM users WHERE username=?').get(username);
-  if (existing) return res.status(409).json({ error: 'Username già esistente' });
+  const { nome, email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email e password obbligatorie' });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Email non valida' });
+  const emailLower = email.toLowerCase().trim();
+  if (db.prepare('SELECT id FROM users WHERE username=?').get(emailLower)) return res.status(409).json({ error: 'Email già registrata' });
   const hash = await bcrypt.hash(password, 10);
-  const user = {
-    id: Date.now().toString(), username, password: hash,
-    nome: nome || username, email: email || null,
-    reminder_days: 3, created_at: new Date().toISOString()
-  };
+  const user = { id: Date.now().toString(), username: emailLower, password: hash, nome: nome?.trim() || emailLower, email: emailLower, reminder_days: 3, created_at: new Date().toISOString() };
   db.prepare('INSERT INTO users (id,username,password,nome,email,reminder_days,created_at) VALUES (?,?,?,?,?,?,?)')
     .run(user.id, user.username, user.password, user.nome, user.email, user.reminder_days, user.created_at);
   const token = jwt.sign({ id: user.id, username: user.username, nome: user.nome }, JWT_SECRET, { expiresIn: '30d' });
@@ -134,8 +131,9 @@ app.post('/api/register', async (req, res) => {
 });
 
 app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = db.prepare('SELECT * FROM users WHERE username=?').get(username);
+  const { email, password } = req.body;
+  const emailLower = (email || '').toLowerCase().trim();
+  const user = db.prepare('SELECT * FROM users WHERE username=?').get(emailLower);
   if (!user) return res.status(401).json({ error: 'Credenziali non valide' });
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) return res.status(401).json({ error: 'Credenziali non valide' });
