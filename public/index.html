@@ -461,7 +461,9 @@ function renderRendiconto() {
   function row(label, vals, cls='') {
     const tot=vals.reduce((a,b)=>a+b,0);
     const isSaldo=cls.includes('sal');
-    return `<tr class="${cls}"><td>${label}</td>${vals.map(v=>`<td class="${isSaldo?(v>=0?'pos':'neg'):''}">${fmt(v)}</td>`).join('')}<td class="${isSaldo?(tot>=0?'pos':'neg')}">${fmt(tot)}</td></tr>`;
+    const cells = vals.map(v=>'<td class="'+(isSaldo?(v>=0?'pos':'neg'):'')+'">'+fmt(v)+'</td>').join('');
+    const totCls = isSaldo?(tot>=0?'pos':'neg'):'';
+    return '<tr class="'+cls+'"><td>'+label+'</td>'+cells+'<td class="'+totCls+'">'+fmt(tot)+'</td></tr>';
   }
 
   $('ren-tbody').innerHTML =
