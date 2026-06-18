@@ -55,6 +55,8 @@ app.post('/api/login', async (req, res) => {
   res.json({ token, nome: user.nome, username: user.username });
 });
 
+app.get('/api/health', (req, res) => res.json({ ok: true }));
+
 app.get('/api/me', auth, (req, res) => {
   res.json({ id: req.user.id, username: req.user.username, nome: req.user.nome });
 });
