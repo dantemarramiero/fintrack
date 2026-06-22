@@ -51,6 +51,10 @@ db.exec(`
     id TEXT PRIMARY KEY, userId TEXT, fattura_id TEXT, conto_id TEXT,
     importo REAL, data TEXT, metodo TEXT DEFAULT 'Bonifico', note TEXT, created_at TEXT
   );
+  CREATE TABLE IF NOT EXISTS spese_template (
+    id TEXT PRIMARY KEY, userId TEXT, nome TEXT, cat TEXT, imp REAL,
+    forn TEXT, carta TEXT, deduct TEXT DEFAULT 'Si', note TEXT, created_at TEXT
+  );
 `);
 
 app.use(cors());
@@ -136,8 +140,9 @@ const resourceCols = {
   entrate:     ['data','imp','desc','cat','prov','conto','per','note'],
   carte:       ['nome','banca','num','tipo','lim','saldo','scad','note'],
   conti:       ['nome','banca','iban','tipo','saldo','valuta','note'],
-  fatture:     ['tipo','numero','controparte','importo','iva','importo_totale','data_emissione','data_scadenza','stato','conto_id','note'],
-  pagamenti:   ['fattura_id','conto_id','importo','data','metodo','note']
+  fatture:        ['tipo','numero','controparte','importo','iva','importo_totale','data_emissione','data_scadenza','stato','conto_id','note'],
+  pagamenti:      ['fattura_id','conto_id','importo','data','metodo','note'],
+  spese_template: ['nome','cat','imp','forn','carta','deduct','note']
 };
 
 function crud(resource) {
@@ -186,6 +191,7 @@ crud('carte');
 crud('conti');
 crud('fatture');
 crud('pagamenti');
+crud('spese_template');
 
 // ── Fattura: paga ──────────────────────────────────────────────
 app.post('/api/fatture/:id/paga', auth, (req, res) => {

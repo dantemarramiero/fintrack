@@ -204,6 +204,10 @@
   <!-- SPESE -->
   <div class="page" id="page-spese">
     <div class="action-bar"><span class="sec-title">Spese Operative</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-spesa')">+ Aggiungi</button></div>
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-hdr"><h3>Modelli Ricorrenti</h3><span class="tag" style="margin-left:6px;font-size:11px">stipendi &amp; pay-as-you-go</span><div style="flex:1"></div><button class="btn" onclick="openModal('m-spesa-tmpl')">+ Modello</button></div>
+      <div class="card-body tw"><table><thead><tr><th>Nome</th><th>Categoria</th><th>Importo</th><th>Fornitore / Dipendente</th><th>Carta/Conto</th><th>Deducibile</th><th></th></tr></thead><tbody id="tmpl-tbody"></tbody></table></div>
+    </div>
     <div class="card tw"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Fornitore</th><th>Importo</th><th>Carta/Conto</th><th>Deducibile</th><th></th></tr></thead><tbody id="spese-tbody"></tbody><tfoot><tr class="tr-tot" id="spese-tfoot"></tr></tfoot></table></div>
   </div>
 
@@ -262,7 +266,7 @@
   <div class="modal"><h2>Nuova Licenza / Abbonamento</h2>
     <div class="form-row"><div class="fg"><label>Servizio</label><input id="ab-n" placeholder="es. GitHub, AWS, Figma"></div><div class="fg"><label>Categoria</label><select id="ab-c"><option>Sviluppo</option><option>Cloud / Hosting</option><option>Comunicazione</option><option>Produttività</option><option>Design</option><option>Sicurezza</option><option>Marketing</option><option>AI / ML</option><option>Altro</option></select></div></div>
     <div class="form-row"><div class="fg"><label>Importo (€)</label><input id="ab-i" type="number" step="0.01" placeholder="0.00"></div><div class="fg"><label>Frequenza</label><select id="ab-f"><option>Mensile</option><option>Annuale</option><option>Trimestrale</option><option>Semestrale</option></select></div></div>
-    <div class="form-row"><div class="fg"><label>Prossimo rinnovo</label><input id="ab-r" type="date"></div><div class="fg"><label>Carta / Conto</label><input id="ab-cc" placeholder="es. Revolut Business"></div></div>
+    <div class="form-row"><div class="fg"><label>Prossimo rinnovo</label><input id="ab-r" type="date"></div><div class="fg"><label>Carta / Conto</label><select id="ab-cc"></select></div></div>
     <div class="form-row"><div class="fg"><label>Stato</label><select id="ab-s"><option>Attivo</option><option>Sospeso</option><option>Cancellato</option></select></div><div class="fg"><label>Note</label><input id="ab-no" placeholder="Facoltativo"></div></div>
     <div class="modal-footer"><button class="btn" onclick="closeModal('m-abb')">Annulla</button><button class="btn btn-primary" onclick="saveAbb()">Salva</button></div>
   </div>
@@ -336,10 +340,22 @@
 </div>
 
 
+<!-- Modello spesa ricorrente -->
+<div class="modal-ov" id="m-spesa-tmpl">
+  <div class="modal"><h2>Modello Spesa Ricorrente</h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:1rem">Importo 0 = variabile (es. AWS pay-as-you-go): verrà chiesto ogni volta che usi il modello.</p>
+    <div class="form-row"><div class="fg"><label>Nome modello *</label><input id="tm-n" placeholder="es. Stipendio Mario, AWS mensile"></div><div class="fg"><label>Categoria</label><select id="tm-c"><option>Software / SaaS</option><option>Hardware</option><option>Consulenza</option><option>Stipendi / Collaboratori</option><option>Marketing</option><option>Hosting / Infrastruttura</option><option>Telecomunicazioni</option><option>Formazione</option><option>Trasferte</option><option>Affitto / Coworking</option><option>Legale / Fiscale</option><option>Utenze</option><option>Altro</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Importo fisso (€) — 0 se variabile</label><input id="tm-i" type="number" step="0.01" placeholder="0.00"></div><div class="fg"><label>Fornitore / Dipendente</label><input id="tm-fo" placeholder="es. Mario Rossi, Amazon AWS"></div></div>
+    <div class="form-row"><div class="fg"><label>Carta / Conto</label><select id="tm-cc"></select></div><div class="fg"><label>Deducibile</label><select id="tm-de"><option>Si</option><option>Parziale</option><option>No</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Note</label><input id="tm-no" placeholder="Facoltativo"></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-spesa-tmpl')">Annulla</button><button class="btn btn-primary" onclick="saveSpeseTemplate()">Salva modello</button></div>
+  </div>
+</div>
+
 <script>
 const API = '';
 let token = localStorage.getItem('ft_token') || '';
-let state = { abbonamenti:[], spese:[], entrate:[], carte:[], conti:[], fatture:[], pagamenti:[], dashboard:{} };
+let state = { abbonamenti:[], spese:[], entrate:[], carte:[], conti:[], fatture:[], pagamenti:[], spese_template:[], dashboard:{} };
 let chartF = null, chartC = null;
 let pagaFatturaId = null;
 let fattureFilter = { tipo: 'tutte', stato: 'tutte' };
@@ -400,7 +416,7 @@ async function showApp() {
 }
 
 async function loadAll() {
-  const [a,s,e,c,co,f,p,dash] = await Promise.all([
+  const [a,s,e,c,co,f,p,dash,st] = await Promise.all([
     api('GET','/api/abbonamenti'),
     api('GET','/api/spese'),
     api('GET','/api/entrate'),
@@ -408,15 +424,17 @@ async function loadAll() {
     api('GET','/api/conti'),
     api('GET','/api/fatture'),
     api('GET','/api/pagamenti'),
-    api('GET','/api/dashboard')
+    api('GET','/api/dashboard'),
+    api('GET','/api/spese_template')
   ]);
-  state = {abbonamenti:a, spese:s, entrate:e, carte:c, conti:co, fatture:f, pagamenti:p, dashboard:dash};
+  state = {abbonamenti:a, spese:s, entrate:e, carte:c, conti:co, fatture:f, pagamenti:p, dashboard:dash, spese_template:st};
 }
 
 function renderAll() {
   renderDashboard();
   renderAbb();
   renderSpese();
+  renderSpeseTemplate();
   renderEntrate();
   renderCarte();
   renderConti();
@@ -705,6 +723,70 @@ async function del(resource, id) {
   await loadAll(); renderAll();
 }
 
+// CARTE SELECT
+function populateCarteSelect(selId) {
+  var sel = $(selId);
+  sel.innerHTML = '<option value="">-- Nessuna --</option>';
+  state.carte.forEach(function(c){
+    var opt = document.createElement('option');
+    opt.value = c.nome + (c.num ? ' xxxx-'+c.num : '');
+    opt.textContent = opt.value + ' (' + c.tipo + ')';
+    sel.appendChild(opt);
+  });
+}
+
+// MODELLI SPESA
+function renderSpeseTemplate() {
+  var tb = $('tmpl-tbody');
+  if(!state.spese_template.length){
+    tb.innerHTML='<tr><td colspan="7"><div class="empty">Nessun modello — aggiungine uno per stipendi o costi ricorrenti variabili</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = state.spese_template.map(function(t){
+    var impCell = +t.imp > 0 ? '<b>'+fmt(+t.imp)+'</b>' : '<span class="pill pill-amber">Variabile</span>';
+    var dedCls = t.deduct==='Si' ? 'pill-green' : t.deduct==='Parziale' ? 'pill-amber' : 'pill-red';
+    return '<tr>'+
+      '<td><b>'+t.nome+'</b></td>'+
+      '<td><span class="tag">'+(t.cat||'&mdash;')+'</span></td>'+
+      '<td>'+impCell+'</td>'+
+      '<td>'+(t.forn||'&mdash;')+'</td>'+
+      '<td style="font-size:11px">'+(t.carta||'&mdash;')+'</td>'+
+      '<td><span class="pill '+dedCls+'">'+(t.deduct||'Si')+'</span></td>'+
+      '<td>'+
+        '<button class="btn btn-sm btn-primary" onclick="usaTemplate(\''+t.id+'\')">&#x25B6; Usa</button> '+
+        '<button class="btn btn-sm" onclick="del(\'spese_template\',\''+t.id+'\')">&#x1F5D1;</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+
+async function saveSpeseTemplate() {
+  var body = {
+    nome:$('tm-n').value.trim(), cat:$('tm-c').value,
+    imp:+$('tm-i').value||0, forn:$('tm-fo').value.trim(),
+    carta:$('tm-cc').value, deduct:$('tm-de').value, note:$('tm-no').value.trim()
+  };
+  if(!body.nome){alert('Inserisci il nome del modello');return;}
+  await api('POST','/api/spese_template',body);
+  closeModal('m-spesa-tmpl'); await loadAll(); renderAll();
+}
+
+function usaTemplate(id) {
+  var t = state.spese_template.find(function(x){return x.id===id});
+  if(!t) return;
+  openModal('m-spesa');
+  $('sp-d').value = todayStr();
+  $('sp-i').value = +t.imp > 0 ? t.imp : '';
+  $('sp-de').value = t.nome;
+  var catSel = $('sp-c');
+  for(var i=0;i<catSel.options.length;i++){if(catSel.options[i].text===t.cat){catSel.selectedIndex=i;break;}}
+  $('sp-fo').value = t.forn||'';
+  $('sp-cc').value = t.carta||'';
+  var dSel = $('sp-de2');
+  for(var j=0;j<dSel.options.length;j++){if(dSel.options[j].text===t.deduct){dSel.selectedIndex=j;break;}}
+  $('sp-no').value = t.note||'';
+}
+
 // TABS
 document.querySelectorAll('.tab').forEach(function(t){
   t.addEventListener('click',function(){
@@ -752,7 +834,9 @@ function openModal(id) {
     calcTotFattura();
     populateContiDropdown('ft-conto');
   }
-$(id).classList.add('open');
+  if(id==='m-abb') populateCarteSelect('ab-cc');
+  if(id==='m-spesa-tmpl') populateCarteSelect('tm-cc');
+  $(id).classList.add('open');
 }
 function closeModal(id){ $(id).classList.remove('open'); }
 document.querySelectorAll('.modal-ov').forEach(function(m){
