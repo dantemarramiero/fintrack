@@ -55,6 +55,15 @@ db.exec(`
     id TEXT PRIMARY KEY, userId TEXT, nome TEXT, cat TEXT, imp REAL,
     forn TEXT, carta TEXT, deduct TEXT DEFAULT 'Si', note TEXT, created_at TEXT
   );
+  CREATE TABLE IF NOT EXISTS stipendi (
+    id TEXT PRIMARY KEY, userId TEXT, nome TEXT, ruolo TEXT,
+    costo_mensile REAL, mensilita INTEGER DEFAULT 13,
+    attivo TEXT DEFAULT 'Si', note TEXT, created_at TEXT
+  );
+  CREATE TABLE IF NOT EXISTS licenze_costi (
+    id TEXT PRIMARY KEY, userId TEXT, licenza_id TEXT,
+    anno INTEGER, mese INTEGER, importo REAL, created_at TEXT
+  );
 `);
 
 app.use(cors());
@@ -142,7 +151,8 @@ const resourceCols = {
   conti:       ['nome','banca','iban','tipo','saldo','valuta','note'],
   fatture:        ['tipo','numero','controparte','importo','iva','importo_totale','data_emissione','data_scadenza','stato','conto_id','note'],
   pagamenti:      ['fattura_id','conto_id','importo','data','metodo','note'],
-  spese_template: ['nome','cat','imp','forn','carta','deduct','note']
+  spese_template: ['nome','cat','imp','forn','carta','deduct','note'],
+  stipendi:       ['nome','ruolo','costo_mensile','mensilita','attivo','note']
 };
 
 function crud(resource) {
@@ -192,6 +202,22 @@ crud('conti');
 crud('fatture');
 crud('pagamenti');
 crud('spese_template');
+crud('stipendi');
+
+// ── Licenze costi: GET + batch upsert ─────────────────────────
+app.get('/api/licenze_costi', auth, (req, res) => {
+  const rows = db.prepare('SELECT * FROM licenze_costi WHERE userId=?').all(req.user.id);
+  res.json(rows);
+});
+app.post('/api/licenze_costi/batch', auth, (req, res) => {
+  const { licenza_id, anno, mesi } = req.body;
+  const stmt = db.prepare('INSERT OR REPLACE INTO licenze_costi (id,userId,licenza_id,anno,mese,importo,created_at) VALUES (?,?,?,?,?,?,?)');
+  const now = new Date().toISOString();
+  for (const m of mesi) {
+    stmt.run(licenza_id+'-'+anno+'-'+m.mese, req.user.id, licenza_id, anno, m.mese, +m.importo||0, now);
+  }
+  res.json({ ok: true });
+});
 
 // ── Fattura: paga ──────────────────────────────────────────────
 app.post('/api/fatture/:id/paga', auth, (req, res) => {

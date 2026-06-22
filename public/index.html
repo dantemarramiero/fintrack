@@ -171,6 +171,7 @@
     <div class="tab" data-tab="abbonamenti">Licenze & SaaS</div>
     <div class="tab" data-tab="spese">Spese</div>
     <div class="tab" data-tab="entrate">Ricavi</div>
+    <div class="tab" data-tab="personale">Personale</div>
     <div class="tab" data-tab="carte">Carte Aziendali</div>
     <div class="tab" data-tab="conti">Conti</div>
     <div class="tab" data-tab="fatture">Fatture</div>
@@ -209,6 +210,12 @@
       <div class="card-body tw"><table><thead><tr><th>Nome</th><th>Categoria</th><th>Importo</th><th>Fornitore / Dipendente</th><th>Carta/Conto</th><th>Deducibile</th><th></th></tr></thead><tbody id="tmpl-tbody"></tbody></table></div>
     </div>
     <div class="card tw"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Fornitore</th><th>Importo</th><th>Carta/Conto</th><th>Deducibile</th><th></th></tr></thead><tbody id="spese-tbody"></tbody><tfoot><tr class="tr-tot" id="spese-tfoot"></tr></tfoot></table></div>
+  </div>
+
+  <!-- PERSONALE -->
+  <div class="page" id="page-personale">
+    <div class="action-bar"><span class="sec-title">Gestione Personale</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-stipendio')">+ Dipendente / Collaboratore</button></div>
+    <div class="card tw"><table><thead><tr><th>Nome</th><th>Ruolo</th><th>Costo mensile</th><th>Mensilità</th><th>Costo annuo</th><th>Stato</th><th></th></tr></thead><tbody id="stipendi-tbody"></tbody><tfoot><tr class="tr-tot" id="stipendi-tfoot"></tr></tfoot></table></div>
   </div>
 
   <!-- ENTRATE -->
@@ -340,6 +347,25 @@
 </div>
 
 
+<!-- Stipendio -->
+<div class="modal-ov" id="m-stipendio">
+  <div class="modal"><h2>Dipendente / Collaboratore</h2>
+    <div class="form-row"><div class="fg"><label>Nome *</label><input id="st-nome" placeholder="es. Mario Rossi"></div><div class="fg"><label>Ruolo</label><input id="st-ruolo" placeholder="es. Sviluppatore Senior"></div></div>
+    <div class="form-row"><div class="fg"><label>Costo mensile (€) *</label><input id="st-costo" type="number" step="0.01" placeholder="0.00"></div><div class="fg"><label>Mensilità</label><select id="st-mens"><option value="12">12</option><option value="13" selected>13</option><option value="14">14</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Stato</label><select id="st-att"><option value="Si">Attivo</option><option value="No">Inattivo</option></select></div><div class="fg"><label>Note</label><input id="st-note" placeholder="Facoltativo"></div></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-stipendio')">Annulla</button><button class="btn btn-primary" onclick="saveStipendio()">Salva</button></div>
+  </div>
+</div>
+
+<!-- Costi mensili licenza -->
+<div class="modal-ov" id="m-licenza-costi">
+  <div class="modal"><h2>Costi mensili — <span id="lc-titolo"></span></h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:1rem">Inserisci il costo reale pagato ogni mese. Lascia 0 per usare il costo fisso dell'abbonamento nel rendiconto.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem" id="lc-grid"></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('m-licenza-costi')">Annulla</button><button class="btn btn-primary" onclick="saveLicenzaCosti()">Salva</button></div>
+  </div>
+</div>
+
 <!-- Modello spesa ricorrente -->
 <div class="modal-ov" id="m-spesa-tmpl">
   <div class="modal"><h2>Modello Spesa Ricorrente</h2>
@@ -355,11 +381,12 @@
 <script>
 const API = '';
 let token = localStorage.getItem('ft_token') || '';
-let state = { abbonamenti:[], spese:[], entrate:[], carte:[], conti:[], fatture:[], pagamenti:[], spese_template:[], dashboard:{} };
+let state = { abbonamenti:[], spese:[], entrate:[], carte:[], conti:[], fatture:[], pagamenti:[], spese_template:[], stipendi:[], licenze_costi:[], dashboard:{} };
+var lcLicenzaId = null;
 let chartF = null, chartC = null;
 let pagaFatturaId = null;
 let fattureFilter = { tipo: 'tutte', stato: 'tutte' };
-var editIds = {abb:null, spesa:null, entrata:null, carta:null, conto:null, fattura:null, tmpl:null};
+var editIds = {abb:null, spesa:null, entrata:null, carta:null, conto:null, fattura:null, tmpl:null, stipendio:null};
 
 function selByText(selId, text) {
   var s=$(selId);
@@ -422,7 +449,7 @@ async function showApp() {
 }
 
 async function loadAll() {
-  const [a,s,e,c,co,f,p,dash,st] = await Promise.all([
+  const [a,s,e,c,co,f,p,dash,st,stip,lc] = await Promise.all([
     api('GET','/api/abbonamenti'),
     api('GET','/api/spese'),
     api('GET','/api/entrate'),
@@ -431,9 +458,11 @@ async function loadAll() {
     api('GET','/api/fatture'),
     api('GET','/api/pagamenti'),
     api('GET','/api/dashboard'),
-    api('GET','/api/spese_template')
+    api('GET','/api/spese_template'),
+    api('GET','/api/stipendi'),
+    api('GET','/api/licenze_costi')
   ]);
-  state = {abbonamenti:a, spese:s, entrate:e, carte:c, conti:co, fatture:f, pagamenti:p, dashboard:dash, spese_template:st};
+  state = {abbonamenti:a, spese:s, entrate:e, carte:c, conti:co, fatture:f, pagamenti:p, dashboard:dash, spese_template:st, stipendi:stip, licenze_costi:lc};
 }
 
 function renderAll() {
@@ -441,6 +470,7 @@ function renderAll() {
   renderAbb();
   renderSpese();
   renderSpeseTemplate();
+  renderStipendi();
   renderEntrate();
   renderCarte();
   renderConti();
@@ -454,7 +484,8 @@ function renderDashboard() {
   const costoM = attivi.reduce((s,a)=>s+mensile(a),0);
   const totE = state.entrate.reduce((s,e)=>s+(+e.imp||0),0);
   const totS = state.spese.reduce((s,e)=>s+(+e.imp||0),0);
-  const uscite = totS + costoM;
+  const stipAttiviM = state.stipendi.filter(s=>s.attivo==='Si').reduce((s,x)=>s+(+x.costo_mensile||0),0);
+  const uscite = totS + costoM + stipAttiviM;
   const saldo = totE - uscite;
   const totLim = state.carte.reduce((s,c)=>s+(+c.lim||0),0);
   const totSCC = state.carte.reduce((s,c)=>s+(+c.saldo||0),0);
@@ -467,6 +498,7 @@ function renderDashboard() {
     {l:'Saldo Conti', v:fmt(dash.saldoConti||0), cls:'blue', s:''},
     {l:'Licenze & SaaS/mese', v:fmt(costoM), cls:'blue', s:fmt(costoM*12)+'/anno'},
     {l:'Licenze Attive', v:attivi.length, cls:'purple', s:''},
+    {l:'Costo Personale/mese', v:fmt(stipAttiviM), cls:'purple', s:fmt(stipAttiviM*12)+'/anno'},
     {l:'Utilizzo Carte', v:totLim>0?fmtPct(totSCC/totLim):'&mdash;', cls:'amber', s:fmt(totSCC)+' / '+fmt(totLim)},
     {l:'Fatture aperte', v:(dash.fattureAperte&&dash.fattureAperte.count)||0, cls:'amber', s:dash.fattureAperte?fmt(dash.fattureAperte.tot):''},
     {l:'Fatture scadute', v:(dash.fattureScadute||0), cls:dash.fattureScadute>0?'red':'', s:''}
@@ -534,7 +566,7 @@ function renderAbb() {
   if(!state.abbonamenti.length){tb.innerHTML='<tr><td colspan="9"><div class="empty">Nessun abbonamento</div></td></tr>';$('abb-tfoot').innerHTML='';return;}
   tb.innerHTML=state.abbonamenti.map(function(a){
     var bc=a.stato==='Attivo'?'pill-green':a.stato==='Sospeso'?'pill-amber':'pill-red';
-    return '<tr><td><b>'+a.nome+'</b></td><td><span class="tag">'+(a.cat||'&mdash;')+'</span></td><td>'+fmt(+a.imp)+'</td><td>'+a.freq+'</td><td>'+(a.rinnovo||'&mdash;')+'</td><td style="font-size:11px">'+(a.carta||'&mdash;')+'</td><td><span class="pill '+bc+'">'+a.stato+'</span></td><td><b>'+fmt(mensile(a))+'</b></td><td><button class="btn btn-sm" onclick="editAbb(\''+a.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'abbonamenti\',\''+a.id+'\')">&#x1F5D1;</button></td></tr>';
+    return '<tr><td><b>'+a.nome+'</b></td><td><span class="tag">'+(a.cat||'&mdash;')+'</span></td><td>'+fmt(+a.imp)+'</td><td>'+a.freq+'</td><td>'+(a.rinnovo||'&mdash;')+'</td><td style="font-size:11px">'+(a.carta||'&mdash;')+'</td><td><span class="pill '+bc+'">'+a.stato+'</span></td><td><b>'+fmt(mensile(a))+'</b></td><td><button class="btn btn-sm" title="Costi mensili reali" onclick="apriLicenzaCosti(\''+a.id+'\',\''+a.nome+'\')">&#x1F4CA;</button> <button class="btn btn-sm" onclick="editAbb(\''+a.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'abbonamenti\',\''+a.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
   var tot=state.abbonamenti.filter(function(a){return a.stato==='Attivo'}).reduce(function(s,a){return s+mensile(a)},0);
   $('abb-tfoot').innerHTML='<td colspan="7"><b>Totale mensile attivi</b></td><td><b>'+fmt(tot)+'</b></td><td></td>';
@@ -622,13 +654,25 @@ function renderPagamenti() {
 
 function renderRendiconto() {
   var months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  var annoCorrente=new Date().getFullYear();
   var attivi=state.abbonamenti.filter(function(a){return a.stato==='Attivo'});
-  var cm=attivi.reduce(function(s,a){return s+mensile(a)},0);
   var eM=new Array(12).fill(0), sM=new Array(12).fill(0);
   state.entrate.forEach(function(e){var m=mIdx(e.data);if(m>=0)eM[m]+=(+e.imp||0)});
   state.spese.forEach(function(s){var m=mIdx(s.data);if(m>=0)sM[m]+=(+s.imp||0)});
-  var abbM=new Array(12).fill(cm);
-  var uTot=months.map(function(_,i){return sM[i]+cm});
+  // Licenze: usa costi reali se inseriti, altrimenti costo fisso mensile
+  var abbM=new Array(12).fill(0);
+  for(var mi=0;mi<12;mi++){
+    attivi.forEach(function(a){
+      var lc=state.licenze_costi.find(function(x){return x.licenza_id===a.id&&x.mese===(mi+1)&&x.anno===annoCorrente});
+      abbM[mi]+=(lc && +lc.importo>0) ? +lc.importo : mensile(a);
+    });
+  }
+  var cm=attivi.reduce(function(s,a){return s+mensile(a)},0);
+  // Stipendi
+  var stipAttiviRen=state.stipendi.filter(function(s){return s.attivo==='Si'});
+  var stipM=new Array(12).fill(0);
+  stipAttiviRen.forEach(function(s){for(var i=0;i<12;i++)stipM[i]+=(+s.costo_mensile||0);});
+  var uTot=months.map(function(_,i){return sM[i]+abbM[i]+stipM[i]});
   var sal=months.map(function(_,i){return eM[i]-uTot[i]});
 
   function row(label, vals, cls) {
@@ -640,15 +684,20 @@ function renderRendiconto() {
     return '<tr class="'+cls+'"><td>'+label+'</td>'+cells+'<td class="'+totCls+'">'+fmt(tot)+'</td></tr>';
   }
 
+  var totStipAnno=stipAttiviRen.reduce(function(s,x){return s+(+x.costo_mensile||0)*(+x.mensilita||13)},0);
   $('ren-tbody').innerHTML =
     '<tr class="sec-row"><td colspan="14">&#x1F4B0; RICAVI</td></tr>' + row('Ricavi', eM) +
     '<tr class="sec-row"><td colspan="14">&#x1F4B8; COSTI</td></tr>' +
-    row('Spese operative', sM) + row('Licenze & SaaS', abbM) + row('Totale costi', uTot, 'tot-row') +
+    row('Spese operative', sM) + row('Licenze & SaaS', abbM) + row('Stipendi & Collaboratori', stipM) + row('Totale costi', uTot, 'tot-row') +
     '<tr class="sec-row"><td colspan="14">&#x2696;&#xFE0F; MARGINE</td></tr>' + row('Margine operativo', sal, 'tot-row sal') +
+    '<tr class="sec-row"><td colspan="14">&#x1F465; PERSONALE</td></tr>' +
+    '<tr><td>N° attivi</td>'+months.map(function(){return '<td>'+stipAttiviRen.length+'</td>'}).join('')+'<td>'+stipAttiviRen.length+'</td></tr>' +
+    row('Costo mensile personale', stipM) +
+    '<tr><td>Costo annuo (con mensilità)</td>'+months.map(function(){return '<td>&mdash;</td>'}).join('')+'<td><b>'+fmt(totStipAnno)+'</b></td></tr>' +
     '<tr class="sec-row"><td colspan="14">&#x1F504; LICENZE & SAAS</td></tr>' +
     '<tr><td>N° licenze</td>'+months.map(function(){return '<td>'+attivi.length+'</td>'}).join('')+'<td>'+attivi.length+'</td></tr>' +
     row('Costo mensile licenze', abbM) +
-    '<tr><td>Costo annuo licenze</td>'+months.map(function(){return '<td>&mdash;</td>'}).join('')+'<td><b>'+fmt(cm*12)+'</b></td></tr>';
+    '<tr><td>Costo annuo licenze (fisso)</td>'+months.map(function(){return '<td>&mdash;</td>'}).join('')+'<td><b>'+fmt(cm*12)+'</b></td></tr>';
 }
 
 // CRUD SAVE + EDIT
@@ -781,6 +830,60 @@ async function del(resource, id) {
   await loadAll(); renderAll();
 }
 
+// STIPENDI
+function renderStipendi() {
+  var tb=$('stipendi-tbody');
+  if(!state.stipendi.length){tb.innerHTML='<tr><td colspan="7"><div class="empty">Nessun dipendente / collaboratore</div></td></tr>';$('stipendi-tfoot').innerHTML='';return;}
+  tb.innerHTML=state.stipendi.map(function(s){
+    var annuo=(+s.costo_mensile||0)*(+s.mensilita||13);
+    var bc=s.attivo==='Si'?'pill-green':'pill-red';
+    var label=s.attivo==='Si'?'Attivo':'Inattivo';
+    return '<tr><td><b>'+s.nome+'</b></td><td>'+(s.ruolo||'&mdash;')+'</td><td><b>'+fmt(+s.costo_mensile)+'</b></td><td>'+(s.mensilita||13)+'</td><td>'+fmt(annuo)+'</td><td><span class="pill '+bc+'">'+label+'</span></td><td><button class="btn btn-sm" onclick="editStipendio(\''+s.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'stipendi\',\''+s.id+'\')">&#x1F5D1;</button></td></tr>';
+  }).join('');
+  var totM=state.stipendi.filter(function(s){return s.attivo==='Si'}).reduce(function(s,x){return s+(+x.costo_mensile||0)},0);
+  var totA=state.stipendi.reduce(function(s,x){return s+(+x.costo_mensile||0)*(+x.mensilita||13)},0);
+  $('stipendi-tfoot').innerHTML='<td colspan="2"><b>Totale attivi</b></td><td><b>'+fmt(totM)+'/mese</b></td><td></td><td><b>'+fmt(totA)+'/anno</b></td><td colspan="2"></td>';
+}
+async function saveStipendio() {
+  var body={nome:$('st-nome').value.trim(),ruolo:$('st-ruolo').value.trim(),costo_mensile:+$('st-costo').value||0,mensilita:+$('st-mens').value||13,attivo:$('st-att').value,note:$('st-note').value.trim()};
+  if(!body.nome){alert('Inserisci il nome');return;}
+  var m=editIds.stipendio?'PUT':'POST', u=editIds.stipendio?'/api/stipendi/'+editIds.stipendio:'/api/stipendi';
+  await crudSave(m,u,body,'m-stipendio');
+}
+function editStipendio(id) {
+  var s=state.stipendi.find(function(x){return x.id===id}); if(!s) return;
+  openModal('m-stipendio'); editIds.stipendio=id;
+  $('st-nome').value=s.nome||''; $('st-ruolo').value=s.ruolo||'';
+  $('st-costo').value=s.costo_mensile||0; selByText('st-mens',String(s.mensilita||13));
+  selByText('st-att',s.attivo||'Si'); $('st-note').value=s.note||'';
+}
+
+// LICENZE COSTI
+function apriLicenzaCosti(lid, nome) {
+  lcLicenzaId=lid; $('lc-titolo').textContent=nome;
+  var months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  var anno=new Date().getFullYear();
+  var abb=state.abbonamenti.find(function(a){return a.id===lid});
+  var grid=$('lc-grid'); grid.innerHTML='';
+  months.forEach(function(mn,i){
+    var lc=state.licenze_costi.find(function(x){return x.licenza_id===lid&&x.mese===(i+1)&&x.anno===anno});
+    var val=lc&&+lc.importo>0?+lc.importo:'';
+    var ph=abb?mensile(abb).toFixed(2):'0.00';
+    var div=document.createElement('div');
+    div.innerHTML='<div style="font-size:11px;font-weight:600;color:var(--hint);margin-bottom:4px">'+mn+'</div>'+
+      '<input type="number" step="0.01" placeholder="'+ph+'" value="'+val+'" id="lc-m'+(i+1)+'" style="width:100%;padding:8px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px">';
+    grid.appendChild(div);
+  });
+  openModal('m-licenza-costi');
+}
+async function saveLicenzaCosti() {
+  var anno=new Date().getFullYear();
+  var mesi=[];
+  for(var i=1;i<=12;i++){var v=$('lc-m'+i).value;mesi.push({mese:i,importo:v===''?0:+v});}
+  await api('POST','/api/licenze_costi/batch',{licenza_id:lcLicenzaId,anno:anno,mesi:mesi});
+  closeModal('m-licenza-costi'); await loadAll(); renderAll();
+}
+
 // CARTE SELECT
 function populateCarteSelect(selId) {
   var sel = $(selId);
@@ -903,6 +1006,7 @@ function openModal(id) {
   if(id==='m-conto')    { editIds.conto=null; }
   if(id==='m-fattura')  { editIds.fattura=null; }
   if(id==='m-spesa-tmpl') { editIds.tmpl=null; populateCarteSelect('tm-cc'); }
+  if(id==='m-stipendio') { editIds.stipendio=null; }
   $(id).classList.add('open');
 }
 function closeModal(id){ $(id).classList.remove('open'); }
