@@ -196,7 +196,7 @@
     <div class="kpi-grid" id="kpi-grid"><div class="loading">Caricamento...</div></div>
     <div class="row2">
       <div class="card"><div class="card-hdr"><h3>Flusso Entrate / Uscite</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-flussi">Grafico entrate vs uscite.</canvas></div></div></div>
-      <div class="card"><div class="card-hdr"><h3>Spese per Categoria</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-cat">Grafico categorie.</canvas></div></div></div>
+      <div class="card"><div class="card-hdr"><h3>Spese per Categoria</h3></div><div class="card-body"><div id="chart-cat-empty" class="empty" style="display:none">Nessuna spesa inserita</div><div class="chart-wrap" id="chart-cat-wrap"><canvas id="chart-cat">Grafico categorie.</canvas></div></div></div>
     </div>
     <div class="row2">
       <div class="card"><div class="card-hdr"><h3>Abbonamenti Attivi</h3><span class="pill pill-blue" id="dash-abb-cnt">0</span></div><div class="card-body tw"><table><thead><tr><th>Servizio</th><th>Carta</th><th>Freq.</th><th>€/mese</th></tr></thead><tbody id="dash-abb-tbody"></tbody></table></div></div>
@@ -533,7 +533,8 @@ function buildCharts(attivi, costoM) {
   var labs=Object.keys(catMap), vals=Object.values(catMap);
   var pal=['#2D6A9F','#27AE60','#E05A4A','#F39C12','#8E44AD','#16A085','#D35400','#2C3E50','#1ABC9C','#E74C3C'];
   if(chartC) chartC.destroy();
-  if(!labs.length){$('chart-cat').parentElement.innerHTML='<div class="empty">Nessuna spesa inserita</div>';return;}
+  if(!labs.length){$('chart-cat-empty').style.display='block';$('chart-cat-wrap').style.display='none';return;}
+  $('chart-cat-empty').style.display='none';$('chart-cat-wrap').style.display='';
   chartC = new Chart($('chart-cat'),{type:'doughnut',data:{labels:labs,datasets:[{data:vals,backgroundColor:pal.slice(0,labs.length),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}}}}});
 }
 
