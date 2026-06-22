@@ -148,23 +148,11 @@
       <h1>&#x1F4CA; FinTrack</h1>
       <p>Rendiconto Economico-Finanziario Personale</p>
     </div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" data-tab="login">Accedi</div>
-      <div class="auth-tab" data-tab="register">Registrati</div>
-    </div>
     <div id="auth-error" class="auth-error"></div>
 
     <div id="form-login" class="auth-form active">
-      <div class="field"><label>Email</label><input id="l-email" type="email" placeholder="tua@email.com" autocomplete="email"></div>
-      <div class="field"><label>Password</label><input id="l-pass" type="password" placeholder="Password" autocomplete="current-password"></div>
+      <div class="field"><label>Password</label><input id="l-pass" type="password" placeholder="Password di accesso" autocomplete="current-password"></div>
       <button class="btn-auth" onclick="doLogin()">Entra</button>
-    </div>
-
-    <div id="form-register" class="auth-form">
-      <div class="field"><label>Nome</label><input id="r-nome" type="text" placeholder="Come ti chiami?"></div>
-      <div class="field"><label>Email</label><input id="r-email" type="email" placeholder="tua@email.com" autocomplete="email"></div>
-      <div class="field"><label>Password</label><input id="r-pass" type="password" placeholder="Minimo 8 caratteri" autocomplete="new-password"></div>
-      <button class="btn-auth" onclick="doRegister()">Crea account</button>
     </div>
   </div>
 </div>
@@ -405,19 +393,8 @@ function showErr(msg){ const e=$('auth-error'); e.textContent=msg; e.classList.a
 
 async function doLogin() {
   try {
-    const d = await api('POST','/api/login',{email:$('l-email').value.trim(),password:$('l-pass').value});
+    const d = await api('POST','/api/login',{password:$('l-pass').value});
     token = d.token; localStorage.setItem('ft_token',token);
-    $('user-label').textContent = d.nome || d.username;
-    showApp();
-  } catch(e){ showErr(e.message); }
-}
-
-async function doRegister() {
-  if($('r-pass').value.length < 8){ showErr('Password di almeno 8 caratteri'); return; }
-  try {
-    const d = await api('POST','/api/register',{nome:$('r-nome').value.trim(),email:$('r-email').value.trim(),password:$('r-pass').value});
-    token = d.token; localStorage.setItem('ft_token',token);
-    $('user-label').textContent = d.nome || d.username;
     showApp();
   } catch(e){ showErr(e.message); }
 }

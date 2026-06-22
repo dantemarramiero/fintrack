@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
@@ -115,50 +114,20 @@ function auth(req, res, next) {
   }
 }
 
-// ── Auth routes ────────────────────────────────────────────────
-app.post('/api/register', async (req, res) => {
-  const { nome, email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email e password obbligatorie' });
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Email non valida' });
-  const emailLower = email.toLowerCase().trim();
-  if (db.prepare('SELECT id FROM users WHERE username=?').get(emailLower)) return res.status(409).json({ error: 'Email già registrata' });
-  const hash = await bcrypt.hash(password, 10);
-  const user = { id: Date.now().toString(), username: emailLower, password: hash, nome: nome?.trim() || emailLower, email: emailLower, reminder_days: 3, created_at: new Date().toISOString() };
-  db.prepare('INSERT INTO users (id,username,password,nome,email,reminder_days,created_at) VALUES (?,?,?,?,?,?,?)')
-    .run(user.id, user.username, user.password, user.nome, user.email, user.reminder_days, user.created_at);
-  const token = jwt.sign({ id: user.id, username: user.username, nome: user.nome }, JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, nome: user.nome, username: user.username });
-});
+const ACCESS_PASSWORD = process.env.ACCESS_PASSWORD || 'BOSS2026';
+const FIXED_USER_ID   = '1';
 
-app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
-  const emailLower = (email || '').toLowerCase().trim();
-  const user = db.prepare('SELECT * FROM users WHERE username=?').get(emailLower);
-  if (!user) return res.status(401).json({ error: 'Credenziali non valide' });
-  const ok = await bcrypt.compare(password, user.password);
-  if (!ok) return res.status(401).json({ error: 'Credenziali non valide' });
-  const token = jwt.sign({ id: user.id, username: user.username, nome: user.nome }, JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, nome: user.nome, username: user.username });
+// ── Auth routes ────────────────────────────────────────────────
+app.post('/api/login', (req, res) => {
+  const { password } = req.body;
+  if (password !== ACCESS_PASSWORD) return res.status(401).json({ error: 'Password errata' });
+  const token = jwt.sign({ id: FIXED_USER_ID }, JWT_SECRET, { expiresIn: '30d' });
+  res.json({ token });
 });
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-app.delete('/api/reset-users', (req, res) => {
-  db.prepare('DELETE FROM users').run();
-  res.json({ ok: true });
-});
-
-app.get('/api/me', auth, (req, res) => {
-  const user = db.prepare('SELECT id,username,nome,email,reminder_days FROM users WHERE id=?').get(req.user.id);
-  res.json(user);
-});
-
-app.patch('/api/me/settings', auth, (req, res) => {
-  const { email, reminder_days } = req.body;
-  db.prepare('UPDATE users SET email=?, reminder_days=? WHERE id=?')
-    .run(email || null, reminder_days || 3, req.user.id);
-  res.json({ ok: true });
-});
+app.get('/api/me', auth, (req, res) => res.json({ id: FIXED_USER_ID }));
 
 // ── CRUD factory ───────────────────────────────────────────────
 const resourceCols = {
