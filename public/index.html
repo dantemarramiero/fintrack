@@ -359,6 +359,12 @@ let state = { abbonamenti:[], spese:[], entrate:[], carte:[], conti:[], fatture:
 let chartF = null, chartC = null;
 let pagaFatturaId = null;
 let fattureFilter = { tipo: 'tutte', stato: 'tutte' };
+var editIds = {abb:null, spesa:null, entrata:null, carta:null, conto:null, fattura:null, tmpl:null};
+
+function selByText(selId, text) {
+  var s=$(selId);
+  for(var i=0;i<s.options.length;i++){if(s.options[i].text===text||s.options[i].value===text){s.selectedIndex=i;return;}}
+}
 
 // helpers
 const $ = id => document.getElementById(id);
@@ -528,7 +534,7 @@ function renderAbb() {
   if(!state.abbonamenti.length){tb.innerHTML='<tr><td colspan="9"><div class="empty">Nessun abbonamento</div></td></tr>';$('abb-tfoot').innerHTML='';return;}
   tb.innerHTML=state.abbonamenti.map(function(a){
     var bc=a.stato==='Attivo'?'pill-green':a.stato==='Sospeso'?'pill-amber':'pill-red';
-    return '<tr><td><b>'+a.nome+'</b></td><td><span class="tag">'+(a.cat||'&mdash;')+'</span></td><td>'+fmt(+a.imp)+'</td><td>'+a.freq+'</td><td>'+(a.rinnovo||'&mdash;')+'</td><td style="font-size:11px">'+(a.carta||'&mdash;')+'</td><td><span class="pill '+bc+'">'+a.stato+'</span></td><td><b>'+fmt(mensile(a))+'</b></td><td><button class="btn btn-sm" onclick="del(\'abbonamenti\',\''+a.id+'\')">&#x1F5D1;</button></td></tr>';
+    return '<tr><td><b>'+a.nome+'</b></td><td><span class="tag">'+(a.cat||'&mdash;')+'</span></td><td>'+fmt(+a.imp)+'</td><td>'+a.freq+'</td><td>'+(a.rinnovo||'&mdash;')+'</td><td style="font-size:11px">'+(a.carta||'&mdash;')+'</td><td><span class="pill '+bc+'">'+a.stato+'</span></td><td><b>'+fmt(mensile(a))+'</b></td><td><button class="btn btn-sm" onclick="editAbb(\''+a.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'abbonamenti\',\''+a.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
   var tot=state.abbonamenti.filter(function(a){return a.stato==='Attivo'}).reduce(function(s,a){return s+mensile(a)},0);
   $('abb-tfoot').innerHTML='<td colspan="7"><b>Totale mensile attivi</b></td><td><b>'+fmt(tot)+'</b></td><td></td>';
@@ -538,7 +544,7 @@ function renderSpese() {
   var tb=$('spese-tbody');
   if(!state.spese.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Nessuna spesa</div></td></tr>';$('spese-tfoot').innerHTML='';return;}
   tb.innerHTML=state.spese.map(function(s){
-    return '<tr><td>'+(s.data||'&mdash;')+'</td><td>'+(s.desc||'&mdash;')+'</td><td><span class="tag">'+s.cat+'</span></td><td>'+(s.forn||'&mdash;')+'</td><td><b>'+fmt(+s.imp)+'</b></td><td style="font-size:11px">'+(s.carta||'&mdash;')+'</td><td><span class="pill '+(s.deduct==='Si'?'pill-green':'pill-red')+'">'+(s.deduct||'No')+'</span></td><td><button class="btn btn-sm" onclick="del(\'spese\',\''+s.id+'\')">&#x1F5D1;</button></td></tr>';
+    return '<tr><td>'+(s.data||'&mdash;')+'</td><td>'+(s.desc||'&mdash;')+'</td><td><span class="tag">'+s.cat+'</span></td><td>'+(s.forn||'&mdash;')+'</td><td><b>'+fmt(+s.imp)+'</b></td><td style="font-size:11px">'+(s.carta||'&mdash;')+'</td><td><span class="pill '+(s.deduct==='Si'?'pill-green':s.deduct==='Parziale'?'pill-amber':'pill-red')+'">'+(s.deduct||'No')+'</span></td><td><button class="btn btn-sm" onclick="editSpesa(\''+s.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'spese\',\''+s.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
   var tot=state.spese.reduce(function(s,e){return s+(+e.imp||0)},0);
   $('spese-tfoot').innerHTML='<td colspan="4"><b>Totale spese</b></td><td><b>'+fmt(tot)+'</b></td><td colspan="3"></td>';
@@ -548,7 +554,7 @@ function renderEntrate() {
   var tb=$('entrate-tbody');
   if(!state.entrate.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Nessuna entrata</div></td></tr>';$('entrate-tfoot').innerHTML='';return;}
   tb.innerHTML=state.entrate.map(function(e){
-    return '<tr><td>'+(e.data||'&mdash;')+'</td><td>'+(e.desc||'&mdash;')+'</td><td><span class="tag">'+e.cat+'</span></td><td>'+(e.prov||'&mdash;')+'</td><td><b class="pos">'+fmt(+e.imp)+'</b></td><td style="font-size:11px">'+(e.conto||'&mdash;')+'</td><td>'+(e.per||'&mdash;')+'</td><td><button class="btn btn-sm" onclick="del(\'entrate\',\''+e.id+'\')">&#x1F5D1;</button></td></tr>';
+    return '<tr><td>'+(e.data||'&mdash;')+'</td><td>'+(e.desc||'&mdash;')+'</td><td><span class="tag">'+e.cat+'</span></td><td>'+(e.prov||'&mdash;')+'</td><td><b class="pos">'+fmt(+e.imp)+'</b></td><td style="font-size:11px">'+(e.conto||'&mdash;')+'</td><td>'+(e.per||'&mdash;')+'</td><td><button class="btn btn-sm" onclick="editEntrata(\''+e.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'entrate\',\''+e.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
   var tot=state.entrate.reduce(function(s,e){return s+(+e.imp||0)},0);
   $('entrate-tfoot').innerHTML='<td colspan="4"><b>Totale entrate</b></td><td><b class="pos">'+fmt(tot)+'</b></td><td colspan="3"></td>';
@@ -560,7 +566,7 @@ function renderCarte() {
   tb.innerHTML=state.carte.map(function(c){
     var p=+c.lim>0?(+c.saldo)/(+c.lim):0;
     var col=p>.8?'var(--red)':p>.5?'var(--amber)':'var(--green)';
-    return '<tr><td><b>'+c.nome+'</b></td><td>'+(c.banca||'&mdash;')+'</td><td>xxxx-'+(c.num||'&mdash;')+'</td><td><span class="tag">'+c.tipo+'</span></td><td>'+fmt(+c.lim)+'</td><td>'+fmt(+c.saldo)+'</td><td style="color:'+col+';font-weight:700">'+fmtPct(p)+'</td><td>'+(c.scad||'&mdash;')+'</td><td><button class="btn btn-sm" onclick="del(\'carte\',\''+c.id+'\')">&#x1F5D1;</button></td></tr>';
+    return '<tr><td><b>'+c.nome+'</b></td><td>'+(c.banca||'&mdash;')+'</td><td>xxxx-'+(c.num||'&mdash;')+'</td><td><span class="tag">'+c.tipo+'</span></td><td>'+fmt(+c.lim)+'</td><td>'+fmt(+c.saldo)+'</td><td style="color:'+col+';font-weight:700">'+fmtPct(p)+'</td><td>'+(c.scad||'&mdash;')+'</td><td><button class="btn btn-sm" onclick="editCarta(\''+c.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'carte\',\''+c.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
   var tL=state.carte.reduce(function(s,c){return s+(+c.lim||0)},0), tS=state.carte.reduce(function(s,c){return s+(+c.saldo||0)},0);
   $('carte-tfoot').innerHTML='<td colspan="4"><b>Totale</b></td><td><b>'+fmt(tL)+'</b></td><td><b>'+fmt(tS)+'</b></td><td colspan="3"></td>';
@@ -570,7 +576,7 @@ function renderConti() {
   var tb=$('conti-tbody');
   if(!state.conti.length){tb.innerHTML='<tr><td colspan="7"><div class="empty">Nessun conto</div></td></tr>';$('conti-tfoot').innerHTML='';return;}
   tb.innerHTML=state.conti.map(function(c){
-    return '<tr><td><b>'+c.nome+'</b></td><td>'+(c.banca||'&mdash;')+'</td><td style="font-size:11px;font-family:monospace">'+(c.iban||'&mdash;')+'</td><td><span class="tag">'+(c.tipo||'Corrente')+'</span></td><td><b>'+fmt(+c.saldo)+'</b></td><td>'+(c.valuta||'EUR')+'</td><td><button class="btn btn-sm" onclick="del(\'conti\',\''+c.id+'\')">&#x1F5D1;</button></td></tr>';
+    return '<tr><td><b>'+c.nome+'</b></td><td>'+(c.banca||'&mdash;')+'</td><td style="font-size:11px;font-family:monospace">'+(c.iban||'&mdash;')+'</td><td><span class="tag">'+(c.tipo||'Corrente')+'</span></td><td><b>'+fmt(+c.saldo)+'</b></td><td>'+(c.valuta||'EUR')+'</td><td><button class="btn btn-sm" onclick="editConto(\''+c.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'conti\',\''+c.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
   var tot=state.conti.reduce(function(s,c){return s+(+c.saldo||0)},0);
   $('conti-tfoot').innerHTML='<td colspan="4"><b>Saldo totale</b></td><td><b>'+fmt(tot)+'</b></td><td colspan="2"></td>';
@@ -598,7 +604,7 @@ function renderFatture() {
   tb.innerHTML=lista.map(function(f){
     var tipoPill = f.tipo==='emessa'?'<span class="pill pill-blue">Emessa</span>':'<span class="pill pill-amber">Ricevuta</span>';
     var pagaBtn = f.stato!=='pagata' ? '<button class="btn btn-sm btn-primary" onclick="apriFatturaPaga(\''+f.id+'\')">Paga</button> ' : '';
-    return '<tr><td>'+(f.numero||'&mdash;')+'</td><td>'+tipoPill+'</td><td>'+(f.controparte||'&mdash;')+'</td><td>'+fmt(f.importo)+'</td><td>'+(f.iva||22)+'%</td><td><b>'+fmt(f.importo_totale)+'</b></td><td>'+(f.data_emissione||'&mdash;')+'</td><td>'+(f.data_scadenza||'&mdash;')+'</td><td>'+fatturaStatoPill(f)+'</td><td>'+pagaBtn+'<button class="btn btn-sm" onclick="del(\'fatture\',\''+f.id+'\')">&#x1F5D1;</button></td></tr>';
+    return '<tr><td>'+(f.numero||'&mdash;')+'</td><td>'+tipoPill+'</td><td>'+(f.controparte||'&mdash;')+'</td><td>'+fmt(f.importo)+'</td><td>'+(f.iva||22)+'%</td><td><b>'+fmt(f.importo_totale)+'</b></td><td>'+(f.data_emissione||'&mdash;')+'</td><td>'+(f.data_scadenza||'&mdash;')+'</td><td>'+fatturaStatoPill(f)+'</td><td>'+pagaBtn+'<button class="btn btn-sm" onclick="editFattura(\''+f.id+'\')">&#x270F;</button> <button class="btn btn-sm" onclick="del(\'fatture\',\''+f.id+'\')">&#x1F5D1;</button></td></tr>';
   }).join('');
 }
 
@@ -645,44 +651,96 @@ function renderRendiconto() {
     '<tr><td>Costo annuo licenze</td>'+months.map(function(){return '<td>&mdash;</td>'}).join('')+'<td><b>'+fmt(cm*12)+'</b></td></tr>';
 }
 
-// CRUD SAVE
-async function saveAbb() {
-  var body={nome:$('ab-n').value.trim(),cat:$('ab-c').value,imp:+$('ab-i').value||0,freq:$('ab-f').value,rinnovo:$('ab-r').value,carta:$('ab-cc').value.trim(),stato:$('ab-s').value,note:$('ab-no').value.trim()};
-  if(!body.nome){alert('Inserisci il nome del servizio');return;}
-  await api('POST','/api/abbonamenti',body);
-  closeModal('m-abb'); await loadAll(); renderAll();
+// CRUD SAVE + EDIT
+function crudSave(method, url, body, modal) {
+  return api(method, url, body).then(function(){ closeModal(modal); return loadAll(); }).then(renderAll);
 }
+
+async function saveAbb() {
+  var body={nome:$('ab-n').value.trim(),cat:$('ab-c').value,imp:+$('ab-i').value||0,freq:$('ab-f').value,rinnovo:$('ab-r').value,carta:$('ab-cc').value,stato:$('ab-s').value,note:$('ab-no').value.trim()};
+  if(!body.nome){alert('Inserisci il nome del servizio');return;}
+  var m=editIds.abb?'PUT':'POST', u=editIds.abb?'/api/abbonamenti/'+editIds.abb:'/api/abbonamenti';
+  await crudSave(m,u,body,'m-abb');
+}
+function editAbb(id) {
+  var a=state.abbonamenti.find(function(x){return x.id===id}); if(!a) return;
+  openModal('m-abb'); editIds.abb=id;
+  $('ab-n').value=a.nome||''; selByText('ab-c',a.cat); $('ab-i').value=a.imp||0; selByText('ab-f',a.freq);
+  $('ab-r').value=a.rinnovo||''; selByText('ab-cc',a.carta); selByText('ab-s',a.stato); $('ab-no').value=a.note||'';
+}
+
 async function saveSpesa() {
   var body={data:$('sp-d').value,imp:+$('sp-i').value||0,desc:$('sp-de').value.trim(),cat:$('sp-c').value,forn:$('sp-fo').value.trim(),carta:$('sp-cc').value.trim(),deduct:$('sp-de2').value,note:$('sp-no').value.trim()};
   if(!body.desc){alert('Inserisci una descrizione');return;}
-  await api('POST','/api/spese',body);
-  closeModal('m-spesa'); await loadAll(); renderAll();
+  var m=editIds.spesa?'PUT':'POST', u=editIds.spesa?'/api/spese/'+editIds.spesa:'/api/spese';
+  await crudSave(m,u,body,'m-spesa');
 }
+function editSpesa(id) {
+  var s=state.spese.find(function(x){return x.id===id}); if(!s) return;
+  openModal('m-spesa'); editIds.spesa=id;
+  $('sp-d').value=s.data||''; $('sp-i').value=s.imp||0; $('sp-de').value=s.desc||'';
+  selByText('sp-c',s.cat); $('sp-fo').value=s.forn||''; $('sp-cc').value=s.carta||'';
+  selByText('sp-de2',s.deduct); $('sp-no').value=s.note||'';
+}
+
 async function saveEntrata() {
   var body={data:$('en-d').value,imp:+$('en-i').value||0,desc:$('en-de').value.trim(),cat:$('en-c').value,prov:$('en-pr').value.trim(),conto:$('en-co').value.trim(),per:$('en-pe').value,note:$('en-no').value.trim()};
   if(!body.desc){alert('Inserisci una descrizione');return;}
-  await api('POST','/api/entrate',body);
-  closeModal('m-entrata'); await loadAll(); renderAll();
+  var m=editIds.entrata?'PUT':'POST', u=editIds.entrata?'/api/entrate/'+editIds.entrata:'/api/entrate';
+  await crudSave(m,u,body,'m-entrata');
 }
+function editEntrata(id) {
+  var e=state.entrate.find(function(x){return x.id===id}); if(!e) return;
+  openModal('m-entrata'); editIds.entrata=id;
+  $('en-d').value=e.data||''; $('en-i').value=e.imp||0; $('en-de').value=e.desc||'';
+  selByText('en-c',e.cat); $('en-pr').value=e.prov||''; $('en-co').value=e.conto||'';
+  selByText('en-pe',e.per); $('en-no').value=e.note||'';
+}
+
 async function saveCarta() {
   var body={nome:$('cc-n').value.trim(),banca:$('cc-b').value.trim(),num:$('cc-nu').value.trim(),tipo:$('cc-t').value,lim:+$('cc-l').value||0,saldo:+$('cc-s').value||0,scad:$('cc-sc').value.trim(),note:$('cc-no').value.trim()};
   if(!body.nome){alert('Inserisci il nome della carta');return;}
-  await api('POST','/api/carte',body);
-  closeModal('m-carta'); await loadAll(); renderAll();
+  var m=editIds.carta?'PUT':'POST', u=editIds.carta?'/api/carte/'+editIds.carta:'/api/carte';
+  await crudSave(m,u,body,'m-carta');
 }
+function editCarta(id) {
+  var c=state.carte.find(function(x){return x.id===id}); if(!c) return;
+  openModal('m-carta'); editIds.carta=id;
+  $('cc-n').value=c.nome||''; $('cc-b').value=c.banca||''; $('cc-nu').value=c.num||'';
+  selByText('cc-t',c.tipo); $('cc-l').value=c.lim||0; $('cc-s').value=c.saldo||0;
+  $('cc-sc').value=c.scad||''; $('cc-no').value=c.note||'';
+}
+
 async function saveConti() {
   var body={nome:$('cn-n').value.trim(),banca:$('cn-b').value.trim(),iban:$('cn-iban').value.trim(),tipo:$('cn-t').value,saldo:+$('cn-s').value||0,valuta:$('cn-v').value,note:$('cn-no').value.trim()};
   if(!body.nome){alert('Inserisci il nome del conto');return;}
-  await api('POST','/api/conti',body);
-  closeModal('m-conto'); await loadAll(); renderAll();
+  var m=editIds.conto?'PUT':'POST', u=editIds.conto?'/api/conti/'+editIds.conto:'/api/conti';
+  await crudSave(m,u,body,'m-conto');
 }
+function editConto(id) {
+  var c=state.conti.find(function(x){return x.id===id}); if(!c) return;
+  openModal('m-conto'); editIds.conto=id;
+  $('cn-n').value=c.nome||''; $('cn-b').value=c.banca||''; $('cn-iban').value=c.iban||'';
+  selByText('cn-t',c.tipo); $('cn-s').value=c.saldo||0; selByText('cn-v',c.valuta||'EUR');
+  $('cn-no').value=c.note||'';
+}
+
 async function saveFattura() {
-  var imp = +$('ft-imp').value||0;
-  var iva = +$('ft-iva').value||22;
+  var imp=+$('ft-imp').value||0, iva=+$('ft-iva').value||22;
   var body={tipo:$('ft-tipo').value,numero:$('ft-num').value.trim(),controparte:$('ft-cp').value.trim(),importo:imp,iva:iva,importo_totale:+(imp*(1+iva/100)).toFixed(2),data_emissione:$('ft-emis').value,data_scadenza:$('ft-scad').value,stato:$('ft-stato').value,conto_id:$('ft-conto').value||null,note:$('ft-no').value.trim()};
-  if(!body.controparte){alert('Inserisci la controparte');return;}
-  await api('POST','/api/fatture',body);
-  closeModal('m-fattura'); await loadAll(); renderAll();
+  if(!body.controparte){alert('Inserisci cliente/fornitore');return;}
+  var m=editIds.fattura?'PUT':'POST', u=editIds.fattura?'/api/fatture/'+editIds.fattura:'/api/fatture';
+  await crudSave(m,u,body,'m-fattura');
+}
+function editFattura(id) {
+  var f=state.fatture.find(function(x){return x.id===id}); if(!f) return;
+  openModal('m-fattura'); editIds.fattura=id;
+  selByText('ft-tipo',f.tipo); $('ft-num').value=f.numero||''; $('ft-cp').value=f.controparte||'';
+  selByText('ft-stato',f.stato); $('ft-emis').value=f.data_emissione||''; $('ft-scad').value=f.data_scadenza||'';
+  $('ft-imp').value=f.importo||0; $('ft-iva').value=f.iva||22; calcTotFattura();
+  populateContiDropdown('ft-conto');
+  if(f.conto_id){ var s=$('ft-conto'); for(var i=0;i<s.options.length;i++){if(s.options[i].value===f.conto_id){s.selectedIndex=i;break;}} }
+  $('ft-no').value=f.note||'';
 }
 
 function calcTotFattura() {
@@ -754,6 +812,7 @@ function renderSpeseTemplate() {
       '<td><span class="pill '+dedCls+'">'+(t.deduct||'Si')+'</span></td>'+
       '<td>'+
         '<button class="btn btn-sm btn-primary" onclick="usaTemplate(\''+t.id+'\')">&#x25B6; Usa</button> '+
+        '<button class="btn btn-sm" onclick="editTemplate(\''+t.id+'\')">&#x270F;</button> '+
         '<button class="btn btn-sm" onclick="del(\'spese_template\',\''+t.id+'\')">&#x1F5D1;</button>'+
       '</td>'+
     '</tr>';
@@ -761,14 +820,17 @@ function renderSpeseTemplate() {
 }
 
 async function saveSpeseTemplate() {
-  var body = {
-    nome:$('tm-n').value.trim(), cat:$('tm-c').value,
-    imp:+$('tm-i').value||0, forn:$('tm-fo').value.trim(),
-    carta:$('tm-cc').value, deduct:$('tm-de').value, note:$('tm-no').value.trim()
-  };
+  var body={nome:$('tm-n').value.trim(),cat:$('tm-c').value,imp:+$('tm-i').value||0,forn:$('tm-fo').value.trim(),carta:$('tm-cc').value,deduct:$('tm-de').value,note:$('tm-no').value.trim()};
   if(!body.nome){alert('Inserisci il nome del modello');return;}
-  await api('POST','/api/spese_template',body);
-  closeModal('m-spesa-tmpl'); await loadAll(); renderAll();
+  var m=editIds.tmpl?'PUT':'POST', u=editIds.tmpl?'/api/spese_template/'+editIds.tmpl:'/api/spese_template';
+  await crudSave(m,u,body,'m-spesa-tmpl');
+}
+function editTemplate(id) {
+  var t=state.spese_template.find(function(x){return x.id===id}); if(!t) return;
+  openModal('m-spesa-tmpl'); editIds.tmpl=id;
+  $('tm-n').value=t.nome||''; selByText('tm-c',t.cat); $('tm-i').value=t.imp||0;
+  $('tm-fo').value=t.forn||''; selByText('tm-cc',t.carta); selByText('tm-de',t.deduct);
+  $('tm-no').value=t.note||'';
 }
 
 function usaTemplate(id) {
@@ -834,8 +896,13 @@ function openModal(id) {
     calcTotFattura();
     populateContiDropdown('ft-conto');
   }
-  if(id==='m-abb') populateCarteSelect('ab-cc');
-  if(id==='m-spesa-tmpl') populateCarteSelect('tm-cc');
+  if(id==='m-abb')       { editIds.abb=null;     populateCarteSelect('ab-cc'); }
+  if(id==='m-spesa')    { editIds.spesa=null; }
+  if(id==='m-entrata')  { editIds.entrata=null; }
+  if(id==='m-carta')    { editIds.carta=null; }
+  if(id==='m-conto')    { editIds.conto=null; }
+  if(id==='m-fattura')  { editIds.fattura=null; }
+  if(id==='m-spesa-tmpl') { editIds.tmpl=null; populateCarteSelect('tm-cc'); }
   $(id).classList.add('open');
 }
 function closeModal(id){ $(id).classList.remove('open'); }
