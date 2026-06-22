@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinTrack — Rendiconto Finanziario</title>
+<title>FinTrack — Gestione Finanziaria Aziendale</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   :root {
@@ -146,7 +146,7 @@
   <div class="auth-card">
     <div class="auth-logo">
       <h1>&#x1F4CA; FinTrack</h1>
-      <p>Rendiconto Economico-Finanziario Personale</p>
+      <p>Gestione Finanziaria Aziendale</p>
     </div>
     <div id="auth-error" class="auth-error"></div>
 
@@ -162,17 +162,16 @@
   <div class="topbar">
     <h1>&#x1F4CA; FinTrack</h1>
     <div class="topbar-right">
-      <span class="user-badge" id="user-label"></span>
-      <button class="btn-settings" onclick="openModal('m-settings')" title="Impostazioni">&#x2699;</button>
+      <span class="user-badge" id="user-label">BossAI</span>
       <button class="btn-logout" onclick="logout()">Esci</button>
     </div>
   </div>
   <div class="tabs">
     <div class="tab active" data-tab="dashboard">Panoramica</div>
-    <div class="tab" data-tab="abbonamenti">Abbonamenti</div>
+    <div class="tab" data-tab="abbonamenti">Licenze & SaaS</div>
     <div class="tab" data-tab="spese">Spese</div>
-    <div class="tab" data-tab="entrate">Entrate</div>
-    <div class="tab" data-tab="carte">Carte</div>
+    <div class="tab" data-tab="entrate">Ricavi</div>
+    <div class="tab" data-tab="carte">Carte Aziendali</div>
     <div class="tab" data-tab="conti">Conti</div>
     <div class="tab" data-tab="fatture">Fatture</div>
     <div class="tab" data-tab="pagamenti">Pagamenti</div>
@@ -183,11 +182,11 @@
   <div class="page active" id="page-dashboard">
     <div class="kpi-grid" id="kpi-grid"><div class="loading">Caricamento...</div></div>
     <div class="row2">
-      <div class="card"><div class="card-hdr"><h3>Flusso Entrate / Uscite</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-flussi">Grafico entrate vs uscite.</canvas></div></div></div>
+      <div class="card"><div class="card-hdr"><h3>Ricavi vs Costi</h3></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-flussi">Grafico entrate vs uscite.</canvas></div></div></div>
       <div class="card"><div class="card-hdr"><h3>Spese per Categoria</h3></div><div class="card-body"><div id="chart-cat-empty" class="empty" style="display:none">Nessuna spesa inserita</div><div class="chart-wrap" id="chart-cat-wrap"><canvas id="chart-cat">Grafico categorie.</canvas></div></div></div>
     </div>
     <div class="row2">
-      <div class="card"><div class="card-hdr"><h3>Abbonamenti Attivi</h3><span class="pill pill-blue" id="dash-abb-cnt">0</span></div><div class="card-body tw"><table><thead><tr><th>Servizio</th><th>Carta</th><th>Freq.</th><th>€/mese</th></tr></thead><tbody id="dash-abb-tbody"></tbody></table></div></div>
+      <div class="card"><div class="card-hdr"><h3>Licenze & SaaS Attive</h3><span class="pill pill-blue" id="dash-abb-cnt">0</span></div><div class="card-body tw"><table><thead><tr><th>Servizio</th><th>Carta/Conto</th><th>Freq.</th><th>€/mese</th></tr></thead><tbody id="dash-abb-tbody"></tbody></table></div></div>
       <div class="card"><div class="card-hdr"><h3>Utilizzo Carte</h3></div><div class="card-body" id="dash-carte-body"></div></div>
     </div>
     <div class="row2" style="margin-bottom:0">
@@ -198,31 +197,31 @@
 
   <!-- ABBONAMENTI -->
   <div class="page" id="page-abbonamenti">
-    <div class="action-bar"><span class="sec-title">Abbonamenti Ricorrenti</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-abb')">+ Aggiungi</button></div>
-    <div class="card tw"><table><thead><tr><th>Servizio</th><th>Cat.</th><th>Importo</th><th>Freq.</th><th>Rinnovo</th><th>Carta</th><th>Stato</th><th>€/mese</th><th></th></tr></thead><tbody id="abb-tbody"></tbody><tfoot><tr class="tr-tot" id="abb-tfoot"></tr></tfoot></table></div>
+    <div class="action-bar"><span class="sec-title">Licenze & Abbonamenti SaaS</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-abb')">+ Aggiungi</button></div>
+    <div class="card tw"><table><thead><tr><th>Servizio</th><th>Cat.</th><th>Importo</th><th>Freq.</th><th>Rinnovo</th><th>Carta/Conto</th><th>Stato</th><th>€/mese</th><th></th></tr></thead><tbody id="abb-tbody"></tbody><tfoot><tr class="tr-tot" id="abb-tfoot"></tr></tfoot></table></div>
   </div>
 
   <!-- SPESE -->
   <div class="page" id="page-spese">
-    <div class="action-bar"><span class="sec-title">Registro Spese</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-spesa')">+ Aggiungi</button></div>
-    <div class="card tw"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Fornitore</th><th>Importo</th><th>Carta</th><th>Deducibile</th><th></th></tr></thead><tbody id="spese-tbody"></tbody><tfoot><tr class="tr-tot" id="spese-tfoot"></tr></tfoot></table></div>
+    <div class="action-bar"><span class="sec-title">Spese Operative</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-spesa')">+ Aggiungi</button></div>
+    <div class="card tw"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Fornitore</th><th>Importo</th><th>Carta/Conto</th><th>Deducibile</th><th></th></tr></thead><tbody id="spese-tbody"></tbody><tfoot><tr class="tr-tot" id="spese-tfoot"></tr></tfoot></table></div>
   </div>
 
   <!-- ENTRATE -->
   <div class="page" id="page-entrate">
-    <div class="action-bar"><span class="sec-title">Registro Entrate</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-entrata')">+ Aggiungi</button></div>
-    <div class="card tw"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Provenienza</th><th>Importo</th><th>Conto</th><th>Periodicità</th><th></th></tr></thead><tbody id="entrate-tbody"></tbody><tfoot><tr class="tr-tot" id="entrate-tfoot"></tr></tfoot></table></div>
+    <div class="action-bar"><span class="sec-title">Ricavi</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-entrata')">+ Aggiungi</button></div>
+    <div class="card tw"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Cliente</th><th>Importo</th><th>Conto</th><th>Tipo</th><th></th></tr></thead><tbody id="entrate-tbody"></tbody><tfoot><tr class="tr-tot" id="entrate-tfoot"></tr></tfoot></table></div>
   </div>
 
   <!-- CARTE -->
   <div class="page" id="page-carte">
-    <div class="action-bar"><span class="sec-title">Carte &amp; Metodi di Pagamento</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-carta')">+ Aggiungi</button></div>
+    <div class="action-bar"><span class="sec-title">Carte Aziendali</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-carta')">+ Aggiungi</button></div>
     <div class="card tw"><table><thead><tr><th>Nome</th><th>Banca</th><th>Ultime 4</th><th>Tipo</th><th>Limite</th><th>Saldo usato</th><th>Utilizzo</th><th>Scadenza</th><th></th></tr></thead><tbody id="carte-tbody"></tbody><tfoot><tr class="tr-tot" id="carte-tfoot"></tr></tfoot></table></div>
   </div>
 
   <!-- CONTI -->
   <div class="page" id="page-conti">
-    <div class="action-bar"><span class="sec-title">Conti Bancari</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-conto')">+ Aggiungi</button></div>
+    <div class="action-bar"><span class="sec-title">Conti Aziendali</span><div style="flex:1"></div><button class="btn btn-primary" onclick="openModal('m-conto')">+ Aggiungi</button></div>
     <div class="card tw"><table><thead><tr><th>Nome</th><th>Banca</th><th>IBAN</th><th>Tipo</th><th>Saldo</th><th>Valuta</th><th></th></tr></thead><tbody id="conti-tbody"></tbody><tfoot><tr class="tr-tot" id="conti-tfoot"></tr></tfoot></table></div>
   </div>
 
@@ -251,7 +250,7 @@
 
   <!-- RENDICONTO -->
   <div class="page" id="page-rendiconto">
-    <div class="action-bar"><span class="sec-title">Rendiconto Economico-Finanziario</span><div style="flex:1"></div><span class="tag">&#x26A1; Aggiornamento automatico</span></div>
+    <div class="action-bar"><span class="sec-title">Conto Economico</span><div style="flex:1"></div><span class="tag">&#x26A1; Aggiornamento automatico</span></div>
     <div class="card"><div class="card-body tw"><table class="ren-table"><thead><tr><th>Voce</th><th>Gen</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mag</th><th>Giu</th><th>Lug</th><th>Ago</th><th>Set</th><th>Ott</th><th>Nov</th><th>Dic</th><th>Totale</th></tr></thead><tbody id="ren-tbody"></tbody></table></div></div>
   </div>
 </div>
@@ -260,10 +259,10 @@
 
 <!-- Abbonamento -->
 <div class="modal-ov" id="m-abb">
-  <div class="modal"><h2>Nuovo Abbonamento</h2>
-    <div class="form-row"><div class="fg"><label>Servizio</label><input id="ab-n" placeholder="es. Netflix"></div><div class="fg"><label>Categoria</label><select id="ab-c"><option>Streaming</option><option>Musica</option><option>Produttività</option><option>Cloud</option><option>Design</option><option>Fitness</option><option>News</option><option>Altro</option></select></div></div>
+  <div class="modal"><h2>Nuova Licenza / Abbonamento</h2>
+    <div class="form-row"><div class="fg"><label>Servizio</label><input id="ab-n" placeholder="es. GitHub, AWS, Figma"></div><div class="fg"><label>Categoria</label><select id="ab-c"><option>Sviluppo</option><option>Cloud / Hosting</option><option>Comunicazione</option><option>Produttività</option><option>Design</option><option>Sicurezza</option><option>Marketing</option><option>AI / ML</option><option>Altro</option></select></div></div>
     <div class="form-row"><div class="fg"><label>Importo (€)</label><input id="ab-i" type="number" step="0.01" placeholder="0.00"></div><div class="fg"><label>Frequenza</label><select id="ab-f"><option>Mensile</option><option>Annuale</option><option>Trimestrale</option><option>Semestrale</option></select></div></div>
-    <div class="form-row"><div class="fg"><label>Prossimo rinnovo</label><input id="ab-r" type="date"></div><div class="fg"><label>Carta</label><input id="ab-cc" placeholder="Visa xxxx-1234"></div></div>
+    <div class="form-row"><div class="fg"><label>Prossimo rinnovo</label><input id="ab-r" type="date"></div><div class="fg"><label>Carta / Conto</label><input id="ab-cc" placeholder="es. Revolut Business"></div></div>
     <div class="form-row"><div class="fg"><label>Stato</label><select id="ab-s"><option>Attivo</option><option>Sospeso</option><option>Cancellato</option></select></div><div class="fg"><label>Note</label><input id="ab-no" placeholder="Facoltativo"></div></div>
     <div class="modal-footer"><button class="btn" onclick="closeModal('m-abb')">Annulla</button><button class="btn btn-primary" onclick="saveAbb()">Salva</button></div>
   </div>
@@ -273,20 +272,20 @@
 <div class="modal-ov" id="m-spesa">
   <div class="modal"><h2>Nuova Spesa</h2>
     <div class="form-row"><div class="fg"><label>Data</label><input id="sp-d" type="date"></div><div class="fg"><label>Importo (€)</label><input id="sp-i" type="number" step="0.01" placeholder="0.00"></div></div>
-    <div class="form-row"><div class="fg"><label>Descrizione</label><input id="sp-de" placeholder="Descrizione"></div><div class="fg"><label>Categoria</label><select id="sp-c"><option>Alimentari</option><option>Trasporti</option><option>Salute</option><option>Abbigliamento</option><option>Casa</option><option>Ristoranti</option><option>Tecnologia</option><option>Formazione</option><option>Intrattenimento</option><option>Viaggi</option><option>Utenze</option><option>Abbonamenti</option><option>Altro</option></select></div></div>
-    <div class="form-row"><div class="fg"><label>Fornitore</label><input id="sp-fo" placeholder="Nome"></div><div class="fg"><label>Carta</label><input id="sp-cc" placeholder="Visa xxxx-1234"></div></div>
-    <div class="form-row"><div class="fg"><label>Deducibile</label><select id="sp-de2"><option>No</option><option>Si</option></select></div><div class="fg"><label>Note</label><input id="sp-no" placeholder="Facoltativo"></div></div>
+    <div class="form-row"><div class="fg"><label>Descrizione</label><input id="sp-de" placeholder="Descrizione"></div><div class="fg"><label>Categoria</label><select id="sp-c"><option>Software / SaaS</option><option>Hardware</option><option>Consulenza</option><option>Stipendi / Collaboratori</option><option>Marketing</option><option>Hosting / Infrastruttura</option><option>Telecomunicazioni</option><option>Formazione</option><option>Trasferte</option><option>Affitto / Coworking</option><option>Legale / Fiscale</option><option>Utenze</option><option>Altro</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Fornitore</label><input id="sp-fo" placeholder="Nome fornitore"></div><div class="fg"><label>Carta / Conto</label><input id="sp-cc" placeholder="es. Revolut Business"></div></div>
+    <div class="form-row"><div class="fg"><label>Deducibile</label><select id="sp-de2"><option>Si</option><option>Parziale</option><option>No</option></select></div><div class="fg"><label>Note</label><input id="sp-no" placeholder="Facoltativo"></div></div>
     <div class="modal-footer"><button class="btn" onclick="closeModal('m-spesa')">Annulla</button><button class="btn btn-primary" onclick="saveSpesa()">Salva</button></div>
   </div>
 </div>
 
 <!-- Entrata -->
 <div class="modal-ov" id="m-entrata">
-  <div class="modal"><h2>Nuova Entrata</h2>
+  <div class="modal"><h2>Nuovo Ricavo</h2>
     <div class="form-row"><div class="fg"><label>Data</label><input id="en-d" type="date"></div><div class="fg"><label>Importo (€)</label><input id="en-i" type="number" step="0.01" placeholder="0.00"></div></div>
-    <div class="form-row"><div class="fg"><label>Descrizione</label><input id="en-de" placeholder="Descrizione"></div><div class="fg"><label>Categoria</label><select id="en-c"><option>Stipendio</option><option>Freelance</option><option>Dividendi</option><option>Affitti</option><option>Rimborsi</option><option>Altro</option></select></div></div>
-    <div class="form-row"><div class="fg"><label>Provenienza</label><input id="en-pr" placeholder="Da chi"></div><div class="fg"><label>Conto accredito</label><input id="en-co" placeholder="es. Conto BNL"></div></div>
-    <div class="form-row"><div class="fg"><label>Periodicità</label><select id="en-pe"><option>Una tantum</option><option>Mensile</option><option>Trimestrale</option><option>Annuale</option></select></div><div class="fg"><label>Note</label><input id="en-no" placeholder="Facoltativo"></div></div>
+    <div class="form-row"><div class="fg"><label>Descrizione</label><input id="en-de" placeholder="es. Sviluppo app cliente"></div><div class="fg"><label>Categoria</label><select id="en-c"><option>Consulenza</option><option>Sviluppo Software</option><option>Manutenzione</option><option>Licenze</option><option>Retainer</option><option>Formazione</option><option>Rimborsi</option><option>Altro</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Cliente</label><input id="en-pr" placeholder="Nome cliente"></div><div class="fg"><label>Conto accredito</label><input id="en-co" placeholder="es. Revolut Business"></div></div>
+    <div class="form-row"><div class="fg"><label>Tipo ricavo</label><select id="en-pe"><option>Una tantum</option><option>Contratto fisso</option><option>Retainer mensile</option><option>Milestone</option></select></div><div class="fg"><label>Note</label><input id="en-no" placeholder="Facoltativo"></div></div>
     <div class="modal-footer"><button class="btn" onclick="closeModal('m-entrata')">Annulla</button><button class="btn btn-primary" onclick="saveEntrata()">Salva</button></div>
   </div>
 </div>
@@ -306,7 +305,7 @@
 <div class="modal-ov" id="m-conto">
   <div class="modal"><h2>Nuovo Conto</h2>
     <div class="form-row"><div class="fg"><label>Nome *</label><input id="cn-n" placeholder="Conto principale"></div><div class="fg"><label>Banca</label><input id="cn-b" placeholder="Intesa Sanpaolo"></div></div>
-    <div class="form-row"><div class="fg"><label>IBAN</label><input id="cn-iban" placeholder="IT60 X054 ..."></div><div class="fg"><label>Tipo</label><select id="cn-t"><option>Corrente</option><option>Risparmio</option><option>Investimento</option><option>Altro</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>IBAN</label><input id="cn-iban" placeholder="IT60 X054 ..."></div><div class="fg"><label>Tipo</label><select id="cn-t"><option>Corrente</option><option>Revolut Business</option><option>PayPal Business</option><option>Deposito</option><option>Altro</option></select></div></div>
     <div class="form-row"><div class="fg"><label>Saldo (€)</label><input id="cn-s" type="number" step="0.01" placeholder="0.00"></div><div class="fg"><label>Valuta</label><select id="cn-v"><option>EUR</option><option>USD</option><option>GBP</option><option>CHF</option></select></div></div>
     <div class="form-row"><div class="fg"><label>Note</label><input id="cn-no" placeholder="Facoltativo"></div></div>
     <div class="modal-footer"><button class="btn" onclick="closeModal('m-conto')">Annulla</button><button class="btn btn-primary" onclick="saveConti()">Salva</button></div>
@@ -317,7 +316,7 @@
 <div class="modal-ov" id="m-fattura">
   <div class="modal"><h2>Nuova Fattura</h2>
     <div class="form-row"><div class="fg"><label>Tipo *</label><select id="ft-tipo"><option value="ricevuta">Ricevuta</option><option value="emessa">Emessa</option></select></div><div class="fg"><label>Numero</label><input id="ft-num" placeholder="es. 2024/001"></div></div>
-    <div class="form-row"><div class="fg"><label>Controparte *</label><input id="ft-cp" placeholder="Nome cliente/fornitore"></div><div class="fg"><label>Stato</label><select id="ft-stato"><option value="non_pagata">Non pagata</option><option value="pagata">Pagata</option></select></div></div>
+    <div class="form-row"><div class="fg"><label>Cliente / Fornitore *</label><input id="ft-cp" placeholder="es. Acme Srl"></div><div class="fg"><label>Stato</label><select id="ft-stato"><option value="non_pagata">Non pagata</option><option value="pagata">Pagata</option></select></div></div>
     <div class="form-row"><div class="fg"><label>Data emissione</label><input id="ft-emis" type="date"></div><div class="fg"><label>Data scadenza</label><input id="ft-scad" type="date"></div></div>
     <div class="form-row"><div class="fg"><label>Imponibile (€) *</label><input id="ft-imp" type="number" step="0.01" placeholder="0.00" oninput="calcTotFattura()"></div><div class="fg"><label>IVA %</label><input id="ft-iva" type="number" step="1" value="22" oninput="calcTotFattura()"></div></div>
     <div class="form-row"><div class="fg"><label>Totale (€)</label><input id="ft-tot" type="number" step="0.01" readonly placeholder="auto"></div><div class="fg"><label>Conto</label><select id="ft-conto"><option value="">-- Nessun conto --</option></select></div></div>
@@ -336,15 +335,6 @@
   </div>
 </div>
 
-<!-- Impostazioni -->
-<div class="modal-ov" id="m-settings">
-  <div class="modal"><h2>&#x2699; Impostazioni</h2>
-    <div class="form-row"><div class="fg"><label>Email reminder</label><input id="st-email" type="email" placeholder="tua@email.com"></div></div>
-    <div class="form-row"><div class="fg"><label>Giorni anticipo reminder (1-30)</label><input id="st-days" type="number" min="1" max="30" placeholder="3"></div></div>
-    <p style="font-size:12px;color:var(--muted);margin-top:.5rem">Ricevi una email di promemoria per le fatture in scadenza nei prossimi N giorni.</p>
-    <div class="modal-footer"><button class="btn" onclick="closeModal('m-settings')">Annulla</button><button class="btn btn-primary" onclick="saveSettings()">Salva</button></div>
-  </div>
-</div>
 
 <script>
 const API = '';
@@ -447,12 +437,12 @@ function renderDashboard() {
   const dash = state.dashboard;
 
   const kpis = [
-    {l:'Entrate Totali', v:fmt(totE), cls:'green', s:''},
-    {l:'Uscite Totali', v:fmt(uscite), cls:'red', s:''},
-    {l:'Saldo Netto', v:fmt(saldo), cls:saldo>=0?'green':'red', s:''},
+    {l:'Ricavi Totali', v:fmt(totE), cls:'green', s:''},
+    {l:'Costi Totali', v:fmt(uscite), cls:'red', s:''},
+    {l:'Margine Operativo', v:fmt(saldo), cls:saldo>=0?'green':'red', s:''},
     {l:'Saldo Conti', v:fmt(dash.saldoConti||0), cls:'blue', s:''},
-    {l:'Abbonamenti/mese', v:fmt(costoM), cls:'blue', s:fmt(costoM*12)+'/anno'},
-    {l:'Abb. Attivi', v:attivi.length, cls:'purple', s:''},
+    {l:'Licenze & SaaS/mese', v:fmt(costoM), cls:'blue', s:fmt(costoM*12)+'/anno'},
+    {l:'Licenze Attive', v:attivi.length, cls:'purple', s:''},
     {l:'Utilizzo Carte', v:totLim>0?fmtPct(totSCC/totLim):'&mdash;', cls:'amber', s:fmt(totSCC)+' / '+fmt(totLim)},
     {l:'Fatture aperte', v:(dash.fattureAperte&&dash.fattureAperte.count)||0, cls:'amber', s:dash.fattureAperte?fmt(dash.fattureAperte.tot):''},
     {l:'Fatture scadute', v:(dash.fattureScadute||0), cls:dash.fattureScadute>0?'red':'', s:''}
@@ -461,7 +451,7 @@ function renderDashboard() {
     return '<div class="kpi '+k.cls+'"><div class="lbl">'+k.l+'</div><div class="val">'+k.v+'</div>'+(k.s?'<div class="sub">'+k.s+'</div>':'')+'</div>';
   }).join('');
 
-  $('dash-abb-cnt').textContent = attivi.length+' attivi';
+  $('dash-abb-cnt').textContent = attivi.length+' attive';
   $('dash-abb-tbody').innerHTML = attivi.slice(0,6).map(function(a){
     return '<tr><td><b>'+a.nome+'</b></td><td><span class="tag">'+(a.carta||'&mdash;')+'</span></td><td>'+a.freq+'</td><td><b>'+fmt(mensile(a))+'</b></td></tr>';
   }).join('') || '<tr><td colspan="4" class="empty">Nessun abbonamento</td></tr>';
@@ -500,8 +490,8 @@ function buildCharts(attivi, costoM) {
   var uM = sM.map(function(v){return v+costoM});
   if(chartF) chartF.destroy();
   chartF = new Chart($('chart-flussi'),{type:'bar',data:{labels:months,datasets:[
-    {label:'Entrate',data:eM,backgroundColor:'rgba(39,174,96,.7)',borderRadius:4},
-    {label:'Uscite',data:uM,backgroundColor:'rgba(224,90,74,.7)',borderRadius:4}
+    {label:'Ricavi',data:eM,backgroundColor:'rgba(39,174,96,.7)',borderRadius:4},
+    {label:'Costi',data:uM,backgroundColor:'rgba(224,90,74,.7)',borderRadius:4}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{ticks:{callback:function(v){return v+'€'}}}}}});
 
   var catMap={};
@@ -627,14 +617,14 @@ function renderRendiconto() {
   }
 
   $('ren-tbody').innerHTML =
-    '<tr class="sec-row"><td colspan="14">&#x1F4B0; ENTRATE</td></tr>' + row('Entrate inserite', eM) +
-    '<tr class="sec-row"><td colspan="14">&#x1F4B8; USCITE</td></tr>' +
-    row('Spese varie', sM) + row('Abbonamenti mensili', abbM) + row('Totale uscite', uTot, 'tot-row') +
-    '<tr class="sec-row"><td colspan="14">&#x2696;&#xFE0F; SALDO</td></tr>' + row('Saldo netto', sal, 'tot-row sal') +
-    '<tr class="sec-row"><td colspan="14">&#x1F504; ABBONAMENTI</td></tr>' +
-    '<tr><td>N° attivi</td>'+months.map(function(){return '<td>'+attivi.length+'</td>'}).join('')+'<td>'+attivi.length+'</td></tr>' +
-    row('Costo mensile abb.', abbM) +
-    '<tr><td>Costo annuo abb.</td>'+months.map(function(){return '<td>&mdash;</td>'}).join('')+'<td><b>'+fmt(cm*12)+'</b></td></tr>';
+    '<tr class="sec-row"><td colspan="14">&#x1F4B0; RICAVI</td></tr>' + row('Ricavi', eM) +
+    '<tr class="sec-row"><td colspan="14">&#x1F4B8; COSTI</td></tr>' +
+    row('Spese operative', sM) + row('Licenze & SaaS', abbM) + row('Totale costi', uTot, 'tot-row') +
+    '<tr class="sec-row"><td colspan="14">&#x2696;&#xFE0F; MARGINE</td></tr>' + row('Margine operativo', sal, 'tot-row sal') +
+    '<tr class="sec-row"><td colspan="14">&#x1F504; LICENZE & SAAS</td></tr>' +
+    '<tr><td>N° licenze</td>'+months.map(function(){return '<td>'+attivi.length+'</td>'}).join('')+'<td>'+attivi.length+'</td></tr>' +
+    row('Costo mensile licenze', abbM) +
+    '<tr><td>Costo annuo licenze</td>'+months.map(function(){return '<td>&mdash;</td>'}).join('')+'<td><b>'+fmt(cm*12)+'</b></td></tr>';
 }
 
 // CRUD SAVE
@@ -708,11 +698,6 @@ async function submitPaga() {
   closeModal('m-paga'); await loadAll(); renderAll();
 }
 
-async function saveSettings() {
-  var body = {email:$('st-email').value.trim()||null, reminder_days:+$('st-days').value||3};
-  await api('PATCH','/api/me/settings',body);
-  closeModal('m-settings');
-}
 
 async function del(resource, id) {
   if(!confirm('Eliminare questo elemento?')) return;
@@ -767,13 +752,7 @@ function openModal(id) {
     calcTotFattura();
     populateContiDropdown('ft-conto');
   }
-  if(id==='m-settings') {
-    api('GET','/api/me').then(function(me){
-      $('st-email').value = me.email||'';
-      $('st-days').value = me.reminder_days||3;
-    });
-  }
-  $(id).classList.add('open');
+$(id).classList.add('open');
 }
 function closeModal(id){ $(id).classList.remove('open'); }
 document.querySelectorAll('.modal-ov').forEach(function(m){
@@ -784,8 +763,7 @@ document.querySelectorAll('.modal-ov').forEach(function(m){
 (async function() {
   if(token) {
     try {
-      var me = await api('GET','/api/me');
-      $('user-label').textContent = me.nome || me.username;
+      await api('GET','/api/me');
       await showApp();
     } catch(e) { token=''; localStorage.removeItem('ft_token'); }
   }
